@@ -1,11 +1,11 @@
 import { dbConnect } from '../../../lib/db/models/mongodb';
-import Ad from '../../../lib/db/models/ad';
+import ad from '../../../lib/db/models/ad';
 import { NextResponse } from 'next/server';
 
 export async function GET() {
   try {
     await dbConnect();
-    const ads = await Ad.find().sort({ createdAt: -1 });
+    const ads = await ad.find().sort({ createdAt: -1 });
     return NextResponse.json({ success: true, ads }, { status: 200 });
   } catch (error) {
     console.error('Error fetching ads:', error);
@@ -30,7 +30,7 @@ export async function POST(request) {
 
     await dbConnect();
 
-    const newAd = new Ad({
+    const newAd = new ad({
       imageUrl,
       title: title || undefined,
       description: description || undefined,

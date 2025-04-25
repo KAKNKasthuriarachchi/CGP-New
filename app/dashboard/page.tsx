@@ -100,7 +100,7 @@ export default function Dashboard() {
 
     const fetchAds = async () => {
       try {
-        const response = await fetch('/api/ads');
+        const response = await fetch('/api/ad');
         const data = await response.json();
 
         if (!response.ok) {
