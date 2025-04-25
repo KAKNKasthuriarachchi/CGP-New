@@ -1,102 +1,236 @@
-import Image from "next/image";
+'use client'
 
-export default function Home() {
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { FaLeaf, FaUserCircle, FaStar } from 'react-icons/fa';
+
+// Define the Tutor interface
+interface Tutor {
+  id: string;
+  name: string;
+  stream: string;
+  section: string;
+  rating: number;
+}
+
+// Tutor Card Component with typed props
+const TutorCard: React.FC<{ tutor: Tutor }> = ({ tutor }) => {
+  const router = useRouter();
+
+  const handleClick = () => {
+    router.push(`/tutor/${tutor.id}`);
+  };
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <div
+      onClick={handleClick}
+      className="p-4 bg-white rounded-lg shadow-md flex-shrink-0 w-64 cursor-pointer hover:shadow-lg transition"
+    >
+      <div className="flex items-center mb-2">
+        <FaUserCircle className="w-10 h-10 text-gray-400 mr-2" />
+        <div>
+          <h3 className="text-lg font-semibold text-gray-800">{tutor.name}</h3>
+          <p className="text-sm text-gray-500">{tutor.stream} - {tutor.section}</p>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
+      </div>
+      <div className="flex items-center">
+        <FaStar className="text-yellow-500 mr-1" />
+        <span className="text-gray-700">{tutor.rating.toFixed(1)}</span>
+      </div>
+    </div>
+  );
+};
+
+// Dashboard Component
+export default function Dashboard() {
+  const router = useRouter();
+  const [tutors, setTutors] = useState<Tutor[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    const fetchTutors = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('/api/tutor?page=1&limit=6');
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Failed to fetch tutors');
+        }
+
+        if (data.success) {
+          const transformedTutors: Tutor[] = data.tutors.map((tutor: any) => ({
+            id: tutor._id,
+            name: `${tutor.firstName} ${tutor.lastName}`,
+            stream: tutor.stream || 'Unknown Stream',
+            section: tutor.section || 'Unknown Section',
+            rating: Math.random() * (5 - 4) + 4, // Mock rating
+          }));
+          setTutors(transformedTutors);
+        } else {
+          throw new Error('Failed to fetch tutors');
+        }
+      } catch (err: any) {
+        console.error('Error fetching tutors:', err);
+        setError(err.message || 'An unexpected error occurred while fetching tutors');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTutors();
+  }, []);
+
+  const handleViewAllTutors = () => {
+    router.push('/tutors');
+  };
+
+  // Handler for "Get Started" button to redirect to login page
+  const handleGetStarted = () => {
+    router.push('/auth/login');
+  };
+
+  // Handler for "Sign Up" button to redirect to signup page
+  const handleSignUp = () => {
+    router.push('/auth/signup');
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-100">
+      {/* Header */}
+      <header className="bg-white shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+          <h1 className="text-2xl font-bold text-green-700">TutorMatch</h1>
+          <nav className="flex space-x-4">
+            <a href="#" className="text-gray-600 hover:text-green-700">Things</a>
+            <a href="#" className="text-gray-600 hover:text-green-700">Zip</a>
+            <button
+              onClick={handleSignUp}
+              className="text-gray-600 hover:text-green-700 focus:outline-none"
+            >
+              Sign Up
+            </button>
+          </nav>
+        </div>
+      </header>
+
+      {/* Hero Section */}
+      <section className="bg-white">
+        <div className="max-w-7xl mx-auto px-4 py-16 text-center">
+          <div className="flex justify-center mb-4">
+            <FaLeaf className="w-12 h-12 text-green-700" />
+          </div>
+          <h2 className="text-4xl font-bold text-gray-800 mb-4">Enhance your learning with the right tutor</h2>
+          <button
+            onClick={handleGetStarted}
+            className="px-6 py-2 bg-green-600 text-white rounded-full hover:bg-green-700 transition"
+          >
+            Get Started
+          </button>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="bg-gray-100">
+        <div className="max-w-7xl mx-auto px-4 py-12">
+          <h3 className="text-2xl font-semibold text-gray-800 text-center mb-8">
+            Join TutorMatch community and connect with educators and learners
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="bg-white p-6 rounded-lg shadow-md">
+              <p className="text-gray-600 mb-4">"I found the perfect tutor and improved my grades"</p>
+              <div className="flex items-center">
+                <FaUserCircle className="w-10 h-10 text-gray-400 mr-2" />
+                <p className="text-gray-800 font-semibold">Priya R.</p>
+              </div>
+            </div>
+            <div className="bg-white p-6 rounded-lg shadow-md">
+              <p className="text-gray-600 mb-4">"This platform helped me find the best tutor for my needs"</p>
+              <div className="flex items-center">
+                <FaUserCircle className="w-10 h-10 text-gray-400 mr-2" />
+                <p className="text-gray-800 font-semibold">John K.</p>
+              </div>
+            </div>
+            <div className="bg-white p-6 rounded-lg shadow-md">
+              <p className="text-gray-600 mb-4">"Teaching is my passion, I enjoy personalized tutoring"</p>
+              <div className="flex items-center">
+                <FaUserCircle className="w-10 h-10 text-gray-400 mr-2" />
+                <p className="text-gray-800 font-semibold">Sarah M.</p>
+              </div>
+            </div>
+            <div className="bg-white p-6 rounded-lg shadow-md">
+              <p className="text-gray-600 mb-4">"Empowering students through personalized tutoring"</p>
+              <div className="flex items-center">
+                <FaUserCircle className="w-10 h-10 text-gray-400 mr-2" />
+                <p className="text-gray-800 font-semibold">David L.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Tutor Preview Section */}
+      <section className="bg-white">
+        <div className="max-w-7xl mx-auto px-4 py-12">
+          <h3 className="text-2xl font-semibold text-gray-800 text-center mb-8">Choose Your Tutor</h3>
+          {error && <p className="text-red-500 text-center mb-4">{error}</p>}
+          {loading && <p className="text-gray-600 text-center mb-4">Loading tutors...</p>}
+          {!loading && tutors.length === 0 && !error && (
+            <p className="text-gray-600 text-center mb-4">No tutors found.</p>
+          )}
+          <div className="flex overflow-x-auto space-x-4 pb-4">
+            {tutors.map(tutor => (
+              <TutorCard key={tutor.id} tutor={tutor} />
+            ))}
+          </div>
+          <div className="text-center mt-6">
+            <button
+              onClick={handleViewAllTutors}
+              className="px-6 py-2 bg-green-600 text-white rounded-full hover:bg-green-700 transition"
+            >
+              View All Tutors
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-green-700 text-white">
+        <div className="max-w-7xl mx-auto px-4 py-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div>
+              <h4 className="text-lg font-semibold mb-4">TutorMatch</h4>
+              <p>Who We Are</p>
+              <p>The Mission</p>
+              <p>Our Blog</p>
+            </div>
+            <div>
+              <h4 className="text-lg font-semibold mb-4">Join the Community</h4>
+              <p>Students</p>
+              <p>Tutors</p>
+              <p>Partners</p>
+            </div>
+            <div>
+              <h4 className="text-lg font-semibold mb-4">Support</h4>
+              <p>Help Center</p>
+              <p>Contact Us</p>
+              <p>FAQs</p>
+            </div>
+            <div>
+              <h4 className="text-lg font-semibold mb-4">Download the App</h4>
+              <div className="flex space-x-4">
+                <a href="#" className="text-white">
+                  <img src="https://via.placeholder.com/120x40?text=App+Store" alt="App Store" />
+                </a>
+                <a href="#" className="text-white">
+                  <img src="https://via.placeholder.com/120x40?text=Google+Play" alt="Google Play" />
+                </a>
+              </div>
+            </div>
+          </div>
+          <p className="text-center mt-8">© 2025 TutorMatch</p>
+        </div>
       </footer>
     </div>
   );
