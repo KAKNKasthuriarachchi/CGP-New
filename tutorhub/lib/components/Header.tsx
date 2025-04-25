@@ -6,7 +6,7 @@ export default function Header() {
           <div className="flex space-x-4">
             <a href="#" className="hover:underline">About</a>
             <a href="#" className="hover:underline">Contact Us</a>
-            <a href="#" className="hover:underline">Sign In</a>
+            <a href="#" className="hover:underline">LogIn</a>
             <a href="#" className="hover:underline">Sign Up</a>
           </div>
           <div className="flex items-center space-x-2">
