@@ -142,6 +142,7 @@ export default function Dashboard() {
   const [currentAdIndex, setCurrentAdIndex] = useState<number>(0);
   const [currentTutorIndex, setCurrentTutorIndex] = useState<number>(0);
   const [isAdHovered, setIsAdHovered] = useState<boolean>(false);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -205,16 +206,38 @@ export default function Dashboard() {
     fetchAds();
   }, [status, router]);
 
-  const handleViewAllTutors = () => {
-    router.push('/tutors');
-  };
+  // Automatic sliding for ads
+  const startAutoSlide = useCallback(() => {
+    if (intervalRef.current) clearInterval(intervalRef.current);
+    intervalRef.current = setInterval(() => {
+      setCurrentAdIndex((prevIndex) => (prevIndex + 1) % ads.length);
+    }, 3000);
+  }, [ads.length]);
+
+  const stopAutoSlide = useCallback(() => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+  }, []);
+
+  useEffect(() => {
+    if (ads.length > 0) {
+      startAutoSlide();
+      return () => stopAutoSlide();
+    }
+  }, [ads, startAutoSlide, stopAutoSlide]);
 
   const nextAd = () => {
     setCurrentAdIndex((prevIndex) => (prevIndex + 1) % ads.length);
+    stopAutoSlide();
+    startAutoSlide();
   };
 
   const prevAd = () => {
     setCurrentAdIndex((prevIndex) => (prevIndex - 1 + ads.length) % ads.length);
+    stopAutoSlide();
+    startAutoSlide();
   };
 
   const nextTutor = () => {
@@ -223,6 +246,10 @@ export default function Dashboard() {
 
   const prevTutor = () => {
     setCurrentTutorIndex((prevIndex) => Math.max(prevIndex - 1, 0));
+  };
+
+  const handleViewAllTutors = () => {
+    router.push('/tutors');
   };
 
   if (status === 'loading') {
@@ -300,7 +327,17 @@ export default function Dashboard() {
             )}
             {ads.length > 0 && (
               <div className="relative">
-                <div className="overflow-hidden">
+                <div
+                  className="overflow-hidden"
+                  onMouseEnter={() => {
+                    setIsAdHovered(true);
+                    stopAutoSlide();
+                  }}
+                  onMouseLeave={() => {
+                    setIsAdHovered(false);
+                    startAutoSlide();
+                  }}
+                >
                   <div
                     className="flex transition-transform duration-500 ease-in-out"
                     style={{ transform: `translateX(-${currentAdIndex * 100}%)` }}
@@ -314,8 +351,6 @@ export default function Dashboard() {
                           className={`relative block w-full transition-all duration-300 ${
                             currentAdIndex === index ? 'max-w-7xl' : 'max-w-5xl'
                           } mx-auto bg-black rounded-lg shadow-lg overflow-hidden`}
-                          onMouseEnter={() => setIsAdHovered(true)}
-                          onMouseLeave={() => setIsAdHovered(false)}
                         >
                           <img
                             src={ad.imageUrl}
@@ -347,7 +382,11 @@ export default function Dashboard() {
                   {ads.map((_, index) => (
                     <button
                       key={index}
-                      onClick={() => setCurrentAdIndex(index)}
+                      onClick={() => {
+                        setCurrentAdIndex(index);
+                        stopAutoSlide();
+                        startAutoSlide();
+                      }}
                       className={`w-3 h-3 rounded-full ${
                         currentAdIndex === index ? 'bg-green-600' : 'bg-gray-300'
                       }`}
