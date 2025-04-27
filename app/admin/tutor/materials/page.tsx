@@ -1,9 +1,8 @@
 // @ts-nocheck
-
 'use client'
 
 import React, { useState, useEffect } from 'react';
-import { FaUser, FaBook, FaPlus, FaMinus, FaFileAlt, FaVideo, FaCamera } from 'react-icons/fa';
+import { FaUser, FaBook, FaPlus, FaMinus, FaFileAlt, FaVideo, FaAd } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
 
 function AddTutorMaterialsPage() {
@@ -16,11 +15,13 @@ function AddTutorMaterialsPage() {
   const [errors, setErrors] = useState({});
 
   // State for ad form
-  /** @type {[ { imageUrl: string }, React.Dispatch<React.SetStateAction<any>> ]} */
   const [adFormData, setAdFormData] = useState({
     imageUrl: '',
+    link: '',
   });
   const [showAdForm, setShowAdForm] = useState(false);
+  const [adUploading, setAdUploading] = useState(false);
+  const [adErrors, setAdErrors] = useState({});
 
   useEffect(() => {
     const fetchTutors = async () => {
@@ -109,23 +110,64 @@ function AddTutorMaterialsPage() {
     }
   };
 
-  // Handle ad form input changes
   const handleAdChange = (e) => {
     const { id, value } = e.target;
     setAdFormData({
       ...adFormData,
       [id]: value,
     });
-    if (errors[id] || errors.general) {
-      setErrors({
-        ...errors,
+    if (adErrors[id] || adErrors.general) {
+      setAdErrors({
+        ...adErrors,
         [id]: '',
         general: '',
       });
     }
   };
 
-  const handleSubmit = async (e) => {
+  const handleAdFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const validImageTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+    if (!validImageTypes.includes(file.type)) {
+      setAdErrors({ ...adErrors, adImageUrl: "Please upload a valid image (JPEG, PNG, GIF, WEBP)" });
+      return;
+    }
+
+    setAdUploading(true);
+    setAdErrors({ ...adErrors, adImageUrl: "" });
+
+    try {
+      const uploadData = new FormData();
+      uploadData.append("file", file);
+      uploadData.append("upload_preset", process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET);
+      uploadData.append("folder", "ads");
+
+      const response = await fetch(
+        `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
+        {
+          method: "POST",
+          body: uploadData,
+        }
+      );
+
+      const data = await response.json();
+      console.log('Cloudinary response:', data);
+      if (!response.ok) {
+        throw new Error(data.error?.message || "Failed to upload to Cloudinary");
+      }
+
+      setAdFormData({ ...adFormData, imageUrl: data.secure_url });
+      setAdUploading(false);
+    } catch (err) {
+      console.error("Error uploading ad to Cloudinary:", err);
+      setAdErrors({ ...adErrors, adImageUrl: "Failed to upload ad image. Please try again." });
+      setAdUploading(false);
+    }
+  };
+
+  const handleMaterialsSubmit = async (e) => {
     e.preventDefault();
 
     const errors = {};
@@ -133,14 +175,6 @@ function AddTutorMaterialsPage() {
     if (!selectedSubjectPlace) errors.subjectPlace = "Please select a subject and place";
     if (!materials.some(m => m.url.trim())) {
       errors.materials = "At least one material URL is required";
-    }
-    // Validate ad form if visible
-    if (showAdForm) {
-      if (!adFormData.imageUrl.trim()) {
-        errors.adImageUrl = "Ad image URL is required";
-      } else if (!/^(https?:\/\/)/i.test(adFormData.imageUrl)) {
-        errors.adImageUrl = "Please enter a valid URL (starting with http:// or https://)";
-      }
     }
 
     if (Object.keys(errors).length > 0) {
@@ -164,7 +198,6 @@ function AddTutorMaterialsPage() {
     };
 
     try {
-      // Submit tutor materials
       const materialsResponse = await fetch('/api/tutor/materials', {
         method: 'POST',
         headers: {
@@ -196,55 +229,76 @@ function AddTutorMaterialsPage() {
         throw new Error(materialsResult.error || 'Failed to add tutor materials');
       }
 
-      // Submit ad if ad form is visible
-      let adSuccess = false;
-      if (showAdForm) {
-        const adResponse = await fetch('/api/ads', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(adFormData),
-        });
+      alert('Tutor materials added successfully!');
 
-        const adText = await adResponse.text();
-        console.log('Raw ad response:', adText);
-
-        if (!adResponse.ok) {
-          throw new Error(`HTTP error! Status: ${adResponse.status}, Body: ${adText}`);
-        }
-
-        let adResult;
-        try {
-          adResult = JSON.parse(adText);
-        } catch (parseError) {
-          console.error('Error parsing ad JSON:', parseError);
-          throw new Error(`Invalid JSON response: ${adText}`);
-        }
-
-        if (adResult.success) {
-          adSuccess = true;
-        } else {
-          throw new Error(adResult.error || 'Failed to add advertisement');
-        }
-      }
-
-      // Show success message
-      alert(
-        adSuccess
-          ? 'Tutor materials and advertisement added successfully!'
-          : 'Tutor materials added successfully!'
-      );
-
-      // Reset form
       setMaterials([{ type: 'Tute', url: '' }]);
       setSelectedSubjectPlace('');
-      setAdFormData({ imageUrl: '' });
-      setShowAdForm(false);
+      setSelectedTutor('');
+      setSubjectPlacePairs([]);
       setErrors({});
     } catch (error) {
       console.error('Error:', error);
       setErrors({ general: error.message || 'An unexpected error occurred. Please try again.' });
+    }
+  };
+
+  const handleAdSubmit = async (e) => {
+    e.preventDefault();
+
+    const errors = {};
+    if (!adFormData.imageUrl.trim()) {
+      errors.adImageUrl = "Ad image is required";
+    }
+    if (adFormData.link && !/^(https?:\/\/)/i.test(adFormData.link)) {
+      errors.adLink = "Please enter a valid URL (starting with http:// or https://)";
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setAdErrors(errors);
+      return;
+    }
+
+    const adPayload = {
+      imageUrl: adFormData.imageUrl,
+      link: adFormData.link || '',
+    };
+
+    try {
+      const adResponse = await fetch('/api/ad', { // Changed from /api/ads to /api/ad
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(adPayload),
+      });
+
+      const adText = await adResponse.text();
+      console.log('Raw ad response:', adText);
+
+      if (!adResponse.ok) {
+        throw new Error(`HTTP error! Status: ${adResponse.status}, Body: ${adText}`);
+      }
+
+      let adResult;
+      try {
+        adResult = JSON.parse(adText);
+      } catch (parseError) {
+        console.error('Error parsing ad JSON:', parseError);
+        throw new Error(`Invalid JSON response: ${adText}`);
+      }
+
+      if (!adResult.success) {
+        throw new Error(adResult.error || 'Failed to add advertisement');
+      }
+
+      alert('Advertisement added successfully!');
+
+      setAdFormData({ imageUrl: '', link: '' });
+      setShowAdForm(false);
+      setAdErrors({});
+    } catch (error) {
+      console.error('Error in handleAdSubmit:', error);
+      setAdErrors({ general: error.message || 'An unexpected error occurred. Please try again.' });
     }
   };
 
@@ -260,7 +314,8 @@ function AddTutorMaterialsPage() {
           TuitionFinder Admin
         </div>
         <h2 className="text-2xl font-semibold mb-6 text-gray-800">Add Tutor Materials</h2>
-        <form onSubmit={handleSubmit}>
+
+        <form onSubmit={handleMaterialsSubmit}>
           <div className="mb-5 relative">
             <div className="relative">
               <FaUser className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
@@ -390,57 +445,6 @@ function AddTutorMaterialsPage() {
             {errors.materials && <p className="mt-1 text-xs text-red-500">{errors.materials}</p>}
           </div>
 
-          {/* Toggle Advertisement Form */}
-          <div className="mb-6">
-            <button
-              type="button"
-              onClick={() => setShowAdForm(!showAdForm)}
-              className="flex items-center text-green-600 hover:text-green-700 focus:outline-none"
-            >
-              {showAdForm ? (
-                <>
-                  <FaMinus className="mr-2" /> Hide Advertisement Form
-                </>
-              ) : (
-                <>
-                  <FaPlus className="mr-2" /> Add an Advertisement
-                </>
-              )}
-            </button>
-          </div>
-
-          {/* Advertisement Form */}
-          {showAdForm && (
-            <div className="border-t pt-6 mb-6">
-              <h2 className="text-xl font-semibold text-gray-800 mb-4">Add Advertisement</h2>
-
-              <div className="mb-5 relative">
-                <div className="relative">
-                  <FaCamera className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
-                  <input
-                    type="text"
-                    id="imageUrl"
-                    className={`w-full py-3 pl-10 pr-3 border rounded-lg bg-gray-50 focus:bg-white transition-all focus:outline-none focus:ring-1 ${
-                      errors.adImageUrl ? 'border-red-500 focus:ring-red-500' : 'border-gray-200 focus:ring-green-500 focus:border-green-500'
-                    }`}
-                    placeholder=" "
-                    value={adFormData.imageUrl}
-                    onChange={handleAdChange}
-                  />
-                  <label
-                    htmlFor="imageUrl"
-                    className={`absolute text-gray-500 left-10 transition-all duration-200 ${
-                      adFormData.imageUrl ? 'text-xs -top-2 bg-white px-1 left-3 text-green-700' : 'top-3'
-                    }`}
-                  >
-                    Ad Image URL
-                  </label>
-                </div>
-                {errors.adImageUrl && <p className="mt-1 text-xs text-red-500">{errors.adImageUrl}</p>}
-              </div>
-            </div>
-          )}
-
           {errors.general && <p className="mb-4 text-red-500 text-center">{errors.general}</p>}
 
           <div className="flex gap-4">
@@ -459,6 +463,109 @@ function AddTutorMaterialsPage() {
             </button>
           </div>
         </form>
+
+        <div className="mt-6">
+          <button
+            type="button"
+            onClick={() => setShowAdForm(!showAdForm)}
+            className="flex items-center text-green-600 hover:text-green-700 focus:outline-none mb-4"
+          >
+            {showAdForm ? (
+              <>
+                <FaMinus className="mr-2" /> Hide Advertisement Form
+              </>
+            ) : (
+              <>
+                <FaPlus className="mr-2" /> Add an Advertisement
+              </>
+            )}
+          </button>
+
+          {showAdForm && (
+            <form onSubmit={handleAdSubmit} className="border-t pt-6">
+              <h2 className="text-xl font-semibold text-gray-800 mb-4">Add Advertisement</h2>
+
+              <div className="mb-5 relative">
+                <div className="relative">
+                  <FaAd className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+                  <input
+                    type="file"
+                    id="imageUrl"
+                    accept="image/*"
+                    className={`w-full py-3 pl-10 pr-3 border rounded-lg bg-gray-50 focus:bg-white transition-all focus:outline-none focus:ring-1 ${
+                      adErrors.adImageUrl ? 'border-red-500 focus:ring-red-500' : 'border-gray-200 focus:ring-green-500 focus:border-green-500'
+                    } ${adUploading ? "opacity-50 cursor-not-allowed" : ""}`}
+                    placeholder=" "
+                    onChange={handleAdFileChange}
+                    disabled={adUploading}
+                  />
+                  <label
+                    htmlFor="imageUrl"
+                    className={`absolute text-gray-500 left-10 transition-all duration-200 top-3 ${
+                      adUploading ? "text-gray-400" : ""
+                    }`}
+                  >
+                    {adUploading ? "Uploading..." : "Upload Advertisement Image"}
+                  </label>
+                </div>
+                {adErrors.adImageUrl && <p className="mt-1 text-xs text-red-500">{adErrors.adImageUrl}</p>}
+
+                {adFormData.imageUrl && (
+                  <div className="mt-4">
+                    <label className="block text-gray-500 mb-2">Advertisement Preview</label>
+                    <a
+                      href={adFormData.link || '#'}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block"
+                    >
+                      <img
+                        src={adFormData.imageUrl}
+                        alt="Advertisement"
+                        className="w-full h-32 object-cover rounded-lg border border-gray-200"
+                      />
+                    </a>
+                  </div>
+                )}
+              </div>
+
+              <div className="mb-5 relative">
+                <div className="relative">
+                  <FaAd className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+                  <input
+                    type="url"
+                    id="link"
+                    className={`w-full py-3 pl-10 pr-3 border rounded-lg bg-gray-50 focus:bg-white transition-all focus:outline-none focus:ring-1 ${
+                      adErrors.adLink ? 'border-red-500 focus:ring-red-500' : 'border-gray-200 focus:ring-green-500 focus:border-green-500'
+                    }`}
+                    placeholder=" "
+                    value={adFormData.link}
+                    onChange={handleAdChange}
+                  />
+                  <label
+                    htmlFor="link"
+                    className={`absolute text-gray-500 left-10 transition-all duration-200 ${
+                      adFormData.link ? 'text-xs -top-2 bg-white px-1 left-3 text-green-700' : 'top-3'
+                    }`}
+                  >
+                    Advertisement Link (Optional, e.g., https://example.com)
+                  </label>
+                </div>
+                {adErrors.adLink && <p className="mt-1 text-xs text-red-500">{adErrors.adLink}</p>}
+              </div>
+
+              {adErrors.general && <p className="mb-4 text-red-500 text-center">{adErrors.general}</p>}
+
+              <button
+                type="submit"
+                className="w-full py-3.5 bg-gradient-to-r from-green-600 to-green-700 text-white font-semibold rounded-lg shadow hover:shadow-lg hover:-translate-y-0.5 transition-all"
+                disabled={adUploading}
+              >
+                ADD ADVERTISEMENT
+              </button>
+            </form>
+          )}
+        </div>
       </div>
     </div>
   );

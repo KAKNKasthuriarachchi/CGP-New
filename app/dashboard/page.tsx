@@ -1,9 +1,11 @@
 'use client'
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { FaUserCircle, FaStar, FaChevronLeft, FaChevronRight, FaSignOutAlt } from 'react-icons/fa';
-import { useSession, signOut } from 'next-auth/react';
+import { FaUserCircle, FaStar, FaChevronLeft, FaChevronRight, FaPhone, FaEnvelope } from 'react-icons/fa';
+import { useSession } from 'next-auth/react';
+import Header from '../components/header';
+import Footer from '../components/footer';
 
 // Define the Tutor interface
 interface Tutor {
@@ -12,6 +14,7 @@ interface Tutor {
   stream: string;
   section: string;
   rating: number;
+  photo?: string;
 }
 
 // Define the Ad interface
@@ -22,30 +25,107 @@ interface Ad {
   link?: string;
 }
 
+// Custom hook for Intersection Observer
+const useIntersectionObserver = (options: IntersectionObserverInit) => {
+  const [isVisible, setIsVisible] = useState(false);
+  const ref = useRef<HTMLDivElement | null>(null);
+  const observerRef = useRef<IntersectionObserver | null>(null);
+
+  const observerCallback = useCallback(
+    (entries: IntersectionObserverEntry[]) => {
+      const [entry] = entries;
+      if (entry.isIntersecting) {
+        setIsVisible(true);
+        if (ref.current && observerRef.current) {
+          observerRef.current.unobserve(ref.current);
+        }
+      }
+    },
+    []
+  );
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(observerCallback, options);
+    observerRef.current = observer;
+
+    if (ref.current) {
+      observer.observe(ref.current);
+    }
+
+    return () => {
+      if (ref.current && observerRef.current) {
+        observerRef.current.unobserve(ref.current);
+      }
+    };
+  }, [observerCallback, options]);
+
+  return { ref, isVisible };
+};
+
+// ScrollReveal Component to wrap sections
+const ScrollReveal: React.FC<{ children: React.ReactNode; stagger?: boolean; index?: number }> = ({ children, stagger = false, index = 0 }) => {
+  const { ref, isVisible } = useIntersectionObserver({
+    threshold: 0.05,
+    rootMargin: '-50px',
+  });
+
+  return (
+    <div
+      ref={ref}
+      className={`transition-opacity duration-1000 ${
+        isVisible ? 'opacity-100 animate-fadeInUp' : 'opacity-0'
+      }`}
+      style={stagger ? { animationDelay: `${index * 0.2}s` } : {}}
+    >
+      {children}
+    </div>
+  );
+};
+
 // Tutor Card Component with typed props
-const TutorCard: React.FC<{ tutor: Tutor }> = ({ tutor }) => {
+const TutorCard: React.FC<{ tutor: Tutor; scale: number }> = ({ tutor, scale }) => {
   const router = useRouter();
+  const [imageFailed, setImageFailed] = useState(false);
 
   const handleClick = () => {
     router.push(`/tutor/${tutor.id}`);
   };
 
+  const iconSizeClass = scale >= 1 ? 'w-40 h-40' : 'w-32 h-32';
+  const textSizeClass = scale >= 1 ? 'text-lg' : 'text-base';
+  const streamSizeClass = scale >= 1 ? 'text-xs' : 'text-[10px]';
+  const starSizeClass = scale >= 1 ? 'w-4 h-4' : 'w-3 h-3';
+
   return (
     <div
       onClick={handleClick}
-      className="p-4 bg-white rounded-lg shadow-md flex-shrink-0 w-64 cursor-pointer hover:shadow-lg transition"
+      className="p-3 bg-white rounded-lg shadow-md w-48 flex-shrink-0 cursor-pointer hover:shadow-lg transition-all flex flex-col items-center"
+      style={{ transform: `scale(${scale})`, transformOrigin: 'center' }}
     >
-      <div className="flex items-center mb-2">
-        <FaUserCircle className="w-10 h-10 text-gray-400 mr-2" />
-        <div>
-          <h3 className="text-lg font-semibold text-gray-800">{tutor.name}</h3>
-          <p className="text-sm text-gray-500">{tutor.stream} - {tutor.section}</p>
+      <div className="mb-4">
+        <div className={`${iconSizeClass} border border-gray-300 flex items-center justify-center rounded-md`}>
+          {tutor.photo && !imageFailed ? (
+            <img
+              src={tutor.photo}
+              alt={`${tutor.name}'s photo`}
+              className="w-full h-full object-contain rounded-md"
+              onError={() => setImageFailed(true)}
+            />
+          ) : (
+            <FaUserCircle className={`${iconSizeClass} text-gray-400`} />
+          )}
         </div>
       </div>
-      <div className="flex items-center">
-        <FaStar className="text-yellow-500 mr-1" />
-        <span className="text-gray-700">{tutor.rating.toFixed(1)}</span>
+      <div className="flex items-center mb-2">
+        {[...Array(5)].map((_, index) => (
+          <FaStar
+            key={index}
+            className={`${starSizeClass} ${index < Math.round(tutor.rating) ? 'text-yellow-500' : 'text-gray-300'}`}
+          />
+        ))}
       </div>
+      <h3 className={`${textSizeClass} font-semibold text-gray-800 text-center`}>{tutor.name}</h3>
+      <p className={`${streamSizeClass} text-gray-500 text-center`}>{tutor.stream} - {tutor.section}</p>
     </div>
   );
 };
@@ -60,9 +140,10 @@ export default function Dashboard() {
   const [loading, setLoading] = useState<boolean>(true);
   const [adError, setAdError] = useState<string | null>(null);
   const [currentAdIndex, setCurrentAdIndex] = useState<number>(0);
+  const [currentTutorIndex, setCurrentTutorIndex] = useState<number>(0);
+  const [isAdHovered, setIsAdHovered] = useState<boolean>(false);
 
   useEffect(() => {
-    // Redirect to homepage if not logged in
     if (status === 'unauthenticated') {
       router.push('/');
       return;
@@ -71,8 +152,9 @@ export default function Dashboard() {
     const fetchTutors = async () => {
       try {
         setLoading(true);
-        const response = await fetch('/api/tutor?page=1&limit=6');
+        const response = await fetch('/api/tutor?page=1&limit=12');
         const data = await response.json();
+        console.log('Raw tutor data:', data);
 
         if (!response.ok) {
           throw new Error(data.error || 'Failed to fetch tutors');
@@ -84,7 +166,8 @@ export default function Dashboard() {
             name: `${tutor.firstName} ${tutor.lastName}`,
             stream: tutor.stream || 'Unknown Stream',
             section: tutor.section || 'Unknown Section',
-            rating: Math.random() * (5 - 4) + 4, // Mock rating
+            rating: Math.random() * (5 - 4) + 4,
+            photo: tutor.picture || undefined,
           }));
           setTutors(transformedTutors);
         } else {
@@ -134,55 +217,83 @@ export default function Dashboard() {
     setCurrentAdIndex((prevIndex) => (prevIndex - 1 + ads.length) % ads.length);
   };
 
-  const handleLogout = async () => {
-    await signOut({ redirect: false });
-    router.push('/');
+  const nextTutor = () => {
+    setCurrentTutorIndex((prevIndex) => Math.min(prevIndex + 1, tutors.length - 1));
   };
 
-  // If loading session, show a loading state
+  const prevTutor = () => {
+    setCurrentTutorIndex((prevIndex) => Math.max(prevIndex - 1, 0));
+  };
+
   if (status === 'loading') {
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   }
 
-  // If not authenticated, the redirect will happen in useEffect; render nothing here
   if (status === 'unauthenticated') {
     return null;
   }
 
   return (
     <div className="min-h-screen bg-gray-100">
-      {/* Header */}
-      <header className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-green-700">TutorMatch</h1>
-          <nav className="flex space-x-4">
-            <a href="#" className="text-gray-600 hover:text-green-700">Things</a>
-            <a href="#" className="text-gray-600 hover:text-green-700">Zip</a>
-            <button
-              onClick={handleLogout}
-              className="text-gray-600 hover:text-green-700 focus:outline-none flex items-center"
-            >
-              <FaSignOutAlt className="mr-1" />
-              Logout
-            </button>
-          </nav>
-        </div>
-      </header>
+      <style jsx global>{`
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(40px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        .animate-fadeInUp {
+          animation: fadeInUp 1.2s ease-out forwards;
+        }
+      `}</style>
 
-      {/* Welcome Section (Outside Header) */}
-      <section className="bg-white">
-        <div className="max-w-7xl mx-auto px-4 py-8">
-          <h2 className="text-4xl font-bold text-gray-800">
-            Welcome, {session?.user?.name ?? 'User'}!
-          </h2>
+      <Header />
+
+      <section className="bg-white relative flex flex-col justify-center items-center py-8">
+        <div className="text-center">
+          <img 
+            src="/logo.png" 
+            alt="Tutor Finder - Make Ideas Happen" 
+            className="max-w-[250px] w-auto m"
+          />
+          <div className="mt-4">
+            <h2 className="text-2xl font-bold text-gray-800">
+              Welcome, {session?.user?.name ?? 'User'}!
+            </h2>
+          </div>
+          <p className="mt-4 text-lg text-gray-600 italic">
+            "Your Learning Journey Starts Here"
+          </p>
         </div>
       </section>
 
-      {/* Main Content */}
-      <section className="bg-white">
-        <div className="max-w-7xl mx-auto px-4 py-16 text-center">
-          {/* Advertisement Slider */}
-          <div className="mt-12">
+      <ScrollReveal>
+        <section className="bg-gray-100">
+          <div className="max-w-7xl mx-auto px-4 py-12 text-center">
+            <h3 className="text-3xl font-bold text-gray-800 mb-4">Discover TutorMatch</h3>
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+              TutorMatch connects students with top-tier educators for personalized learning experiences. 
+              Whether you're mastering a new subject or advancing your skills, our platform makes finding 
+              the perfect tutor easy and seamless. Join our community and start your learning journey today!
+            </p>
+            <button
+              onClick={() => router.push('/about')}
+              className="mt-6 px-6 py-2 bg-green-600 text-white rounded-full hover:bg-green-700 transition"
+            >
+              About Us
+            </button>
+          </div>
+        </section>
+      </ScrollReveal>
+
+      <ScrollReveal>
+        <section className="bg-white">
+          <div className="max-w-[1600px] mx-auto px-4 py-12 text-center">
+            <h3 className="text-2xl font-semibold text-gray-800 mb-8">Explore Our Offers</h3>
             {adError && <p className="text-red-500 text-center mb-4">{adError}</p>}
             {ads.length === 0 && !adError && (
               <p className="text-gray-600 text-center mb-4">No advertisements available.</p>
@@ -195,37 +306,43 @@ export default function Dashboard() {
                     style={{ transform: `translateX(-${currentAdIndex * 100}%)` }}
                   >
                     {ads.map((ad, index) => (
-                      <div key={index} className="min-w-full flex justify-center">
+                      <div 
+                        key={index} 
+                        className="min-w-full flex justify-center"
+                      >
                         <div
-                          className={`block w-full transition-all duration-300 ${
-                            currentAdIndex === index ? 'max-w-2xl' : 'max-w-xl'
-                          } mx-auto bg-gray-100 rounded-lg shadow-lg overflow-hidden`}
+                          className={`relative block w-full transition-all duration-300 ${
+                            currentAdIndex === index ? 'max-w-7xl' : 'max-w-5xl'
+                          } mx-auto bg-black rounded-lg shadow-lg overflow-hidden`}
+                          onMouseEnter={() => setIsAdHovered(true)}
+                          onMouseLeave={() => setIsAdHovered(false)}
                         >
                           <img
                             src={ad.imageUrl}
                             alt="Advertisement"
-                            className="w-full h-48 object-cover"
+                            className="w-full h-[448px] object-contain"
                           />
+                          <button
+                            onClick={prevAd}
+                            className={`absolute left-4 top-1/2 transform -translate-y-1/2 bg-green-600 text-white p-3 rounded-full hover:bg-green-700 transition-all ${
+                              isAdHovered ? 'opacity-100' : 'opacity-0'
+                            }`}
+                          >
+                            <FaChevronLeft size={24} />
+                          </button>
+                          <button
+                            onClick={nextAd}
+                            className={`absolute right-4 top-1/2 transform -translate-y-1/2 bg-green-600 text-white p-3 rounded-full hover:bg-green-700 transition-all ${
+                              isAdHovered ? 'opacity-100' : 'opacity-0'
+                            }`}
+                          >
+                            <FaChevronRight size={24} />
+                          </button>
                         </div>
                       </div>
                     ))}
                   </div>
                 </div>
-
-                <button
-                  onClick={prevAd}
-                  className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-green-600 text-white p-3 rounded-full hover:bg-green-700 transition-all"
-                >
-                  <FaChevronLeft size={20} />
-                </button>
-
-                <button
-                  onClick={nextAd}
-                  className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-green-600 text-white p-3 rounded-full hover:bg-green-700 transition-all"
-                >
-                  <FaChevronRight size={20} />
-                </button>
-
                 <div className="flex justify-center mt-4 space-x-2">
                   {ads.map((_, index) => (
                     <button
@@ -240,110 +357,142 @@ export default function Dashboard() {
               </div>
             )}
           </div>
-        </div>
-      </section>
+        </section>
+      </ScrollReveal>
 
-      {/* Features Section */}
-      <section className="bg-gray-100">
-        <div className="max-w-7xl mx-auto px-4 py-12">
-          <h3 className="text-2xl font-semibold text-gray-800 text-center mb-8">
-            Join TutorMatch community and connect with educators and learners
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div className="bg-white p-6 rounded-lg shadow-md">
-              <p className="text-gray-600 mb-4">"I found the perfect tutor and improved my grades"</p>
-              <div className="flex items-center">
-                <FaUserCircle className="w-10 h-10 text-gray-400 mr-2" />
-                <p className="text-gray-800 font-semibold">Priya R.</p>
+      <ScrollReveal>
+        <section className="bg-gray-100">
+          <div className="max-w-3xl mx-auto px-4 py-16">
+            <h3 className="text-2xl font-semibold text-gray-800 text-center mb-8">Choose Your Tutor</h3>
+            {error && <p className="text-red-500 text-center mb-4">{error}</p>}
+            {loading && <p className="text-gray-600 text-center mb-4">Loading tutors...</p>}
+            {!loading && tutors.length === 0 && !error && (
+              <p className="text-gray-600 text-center mb-4">No tutors found.</p>
+            )}
+            {tutors.length > 0 && (
+              <div className="relative">
+                <div className="flex items-center justify-center">
+                  <button
+                    onClick={prevTutor}
+                    className="flex-none -ml-12 bg-green-600 text-white p-3 rounded-full hover:bg-green-700 transition-all"
+                    disabled={currentTutorIndex === 0}
+                  >
+                    <FaChevronLeft size={20} />
+                  </button>
+                  <div className="flex-1 overflow-x-hidden">
+                    <div className="flex items-center justify-center">
+                      <div
+                        className="flex flex-nowrap transition-transform duration-500 ease-in-out"
+                        style={{
+                          transform: `translateX(calc(50% - ${currentTutorIndex * 320}px - 160px))`,
+                        }}
+                      >
+                        {tutors.map((tutor, index) => {
+                          const distance = Math.abs(index - currentTutorIndex);
+                          const scale = distance === 0 ? 1.2 : distance === 1 ? 1 : 0.8;
+                          return (
+                            <div key={tutor.id} className="flex-shrink-0 w-80 h-96 flex justify-center items-center">
+                              <TutorCard tutor={tutor} scale={scale} />
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    onClick={nextTutor}
+                    className="flex-none -mr-12 bg-green-600 text-white p-3 rounded-full hover:bg-green-700 transition-all"
+                    disabled={currentTutorIndex === tutors.length - 1}
+                  >
+                    <FaChevronRight size={20} />
+                  </button>
+                </div>
+                <div className="flex justify-center mt-4 space-x-2">
+                  {tutors.map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setCurrentTutorIndex(index)}
+                      className={`w-3 h-3 rounded-full ${
+                        currentTutorIndex === index ? 'bg-green-600' : 'bg-gray-300'
+                      }`}
+                    />
+                  ))}
+                </div>
               </div>
-            </div>
-            <div className="bg-white p-6 rounded-lg shadow-md">
-              <p className="text-gray-600 mb-4">"This platform helped me find the best tutor for my needs"</p>
-              <div className="flex items-center">
-                <FaUserCircle className="w-10 h-10 text-gray-400 mr-2" />
-                <p className="text-gray-800 font-semibold">John K.</p>
-              </div>
-            </div>
-            <div className="bg-white p-6 rounded-lg shadow-md">
-              <p className="text-gray-600 mb-4">"Teaching is my passion, I enjoy personalized tutoring"</p>
-              <div className="flex items-center">
-                <FaUserCircle className="w-10 h-10 text-gray-400 mr-2" />
-                <p className="text-gray-800 font-semibold">Sarah M.</p>
-              </div>
-            </div>
-            <div className="bg-white p-6 rounded-lg shadow-md">
-              <p className="text-gray-600 mb-4">"Empowering students through personalized tutoring"</p>
-              <div className="flex items-center">
-                <FaUserCircle className="w-10 h-10 text-gray-400 mr-2" />
-                <p className="text-gray-800 font-semibold">David L.</p>
-              </div>
+            )}
+            <div className="text-center mt-6">
+              <button
+                onClick={handleViewAllTutors}
+                className="px-6 py-2 bg-green-600 text-white rounded-full hover:bg-green-700 transition"
+              >
+                View All Tutors
+              </button>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </ScrollReveal>
 
-      {/* Tutor Preview Section */}
-      <section className="bg-white">
-        <div className="max-w-7xl mx-auto px-4 py-12">
-          <h3 className="text-2xl font-semibold text-gray-800 text-center mb-8">Choose Your Tutor</h3>
-          {error && <p className="text-red-500 text-center mb-4">{error}</p>}
-          {loading && <p className="text-gray-600 text-center mb-4">Loading tutors...</p>}
-          {!loading && tutors.length === 0 && !error && (
-            <p className="text-gray-600 text-center mb-4">No tutors found.</p>
-          )}
-          <div className="flex overflow-x-auto space-x-4 pb-4">
-            {tutors.map(tutor => (
-              <TutorCard key={tutor.id} tutor={tutor} />
-            ))}
+      <ScrollReveal>
+        <section className="bg-white">
+          <div className="max-w-7xl mx-auto px-4 py-12">
+            <h3 className="text-2xl font-semibold text-gray-800 text-center mb-8">
+              What Our Community Says
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              {[
+                { text: "I found the perfect tutor and improved my grades", name: "Priya R." },
+                { text: "This platform helped me find the best tutor for my needs", name: "John K." },
+                { text: "Teaching is my passion, I enjoy personalized tutoring", name: "Sarah M." },
+                { text: "Empowering students through personalized tutoring", name: "David L." },
+              ].map((review, index) => (
+                <ScrollReveal key={index} stagger={true} index={index}>
+                  <div className="bg-gray-100 p-6 rounded-lg shadow-md">
+                    <p className="text-gray-600 mb-4">"{review.text}"</p>
+                    <div className="flex items-center">
+                      <FaUserCircle className="w-10 h-10 text-gray-400 mr-2" />
+                      <p className="text-gray-800 font-semibold">{review.name}</p>
+                    </div>
+                  </div>
+                </ScrollReveal>
+              ))}
+            </div>
           </div>
-          <div className="text-center mt-6">
+        </section>
+      </ScrollReveal>
+
+      <ScrollReveal>
+        <section className="bg-gray-100">
+          <div className="max-w-7xl mx-auto px-4 py-12 text-center">
+            <h3 className="text-2xl font-semibold text-gray-800 mb-8">Get in Touch</h3>
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto mb-8">
+              Have questions or need support? Our team is here to help you every step of the way.
+              Reach out to us via email or phone, or visit our Help Center for more resources.
+            </p>
+            <div className="flex flex-col md:flex-row justify-center space-y-4 md:space-y-0 md:space-x-8">
+              <div className="flex items-center">
+                <FaEnvelope className="text-green-600 w-6 h-6 mr-2" />
+                <a href="mailto:support@tutormatch.com" className="text-gray-800 hover:text-green-700">
+                  support@tutormatch.com
+                </a>
+              </div>
+              <div className="flex items-center">
+                <FaPhone className="text-green-600 w-6 h-6 mr-2" />
+                <a href="tel:+1234567890" className="text-gray-800 hover:text-green-700">
+                  +1 (234) 567-890
+                </a>
+              </div>
+            </div>
             <button
-              onClick={handleViewAllTutors}
-              className="px-6 py-2 bg-green-600 text-white rounded-full hover:bg-green-700 transition"
+              onClick={() => router.push('/support')}
+              className="mt-6 px-6 py-2 bg-green-600 text-white rounded-full hover:bg-green-700 transition"
             >
-              View All Tutors
+              Visit Help Center
             </button>
           </div>
-        </div>
-      </section>
+        </section>
+      </ScrollReveal>
 
-      {/* Footer */}
-      <footer className="bg-green-700 text-white">
-        <div className="max-w-7xl mx-auto px-4 py-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div>
-              <h4 className="text-lg font-semibold mb-4">TutorMatch</h4>
-              <p>Who We Are</p>
-              <p>The Mission</p>
-              <p>Our Blog</p>
-            </div>
-            <div>
-              <h4 className="text-lg font-semibold mb-4">Join the Community</h4>
-              <p>Students</p>
-              <p>Tutors</p>
-              <p>Partners</p>
-            </div>
-            <div>
-              <h4 className="text-lg font-semibold mb-4">Support</h4>
-              <p>Help Center</p>
-              <p>Contact Us</p>
-              <p>FAQs</p>
-            </div>
-            <div>
-              <h4 className="text-lg font-semibold mb-4">Download the App</h4>
-              <div className="flex space-x-4">
-                <a href="#" className="text-white">
-                  <img src="https://via.placeholder.com/120x40?text=App+Store" alt="App Store" />
-                </a>
-                <a href="#" className="text-white">
-                  <img src="https://via.placeholder.com/120x40?text=Google+Play" alt="Google Play" />
-                </a>
-              </div>
-            </div>
-          </div>
-          <p className="text-center mt-8">© 2025 TutorMatch</p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

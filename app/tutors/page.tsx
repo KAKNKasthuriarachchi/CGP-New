@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { FaUserCircle, FaStar } from 'react-icons/fa';
 
@@ -11,33 +11,113 @@ interface Tutor {
   stream: string;
   section: string;
   rating: number;
+  photo?: string;
 }
 
+// Custom hook for Intersection Observer
+const useIntersectionObserver = (options: IntersectionObserverInit) => {
+  const [isVisible, setIsVisible] = useState(false);
+  const ref = useRef<HTMLDivElement | null>(null);
+  const observerRef = useRef<IntersectionObserver | null>(null);
+
+  const observerCallback = useCallback(
+    (entries: IntersectionObserverEntry[]) => {
+      const [entry] = entries;
+      if (entry.isIntersecting) {
+        setIsVisible(true);
+        if (ref.current && observerRef.current) {
+          observerRef.current.unobserve(ref.current);
+        }
+      }
+    },
+    []
+  );
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(observerCallback, options);
+    observerRef.current = observer;
+
+    if (ref.current) {
+      observer.observe(ref.current);
+    }
+
+    return () => {
+      if (ref.current && observerRef.current) {
+        observerRef.current.unobserve(ref.current);
+      }
+    };
+  }, [observerCallback, options]);
+
+  return { ref, isVisible };
+};
+
+// ScrollReveal Component to wrap sections
+const ScrollReveal: React.FC<{ children: React.ReactNode; stagger?: boolean; index?: number }> = ({ children, stagger = false, index = 0 }) => {
+  const { ref, isVisible } = useIntersectionObserver({
+    threshold: 0.05,
+    rootMargin: '-50px',
+  });
+
+  return (
+    <div
+      ref={ref}
+      className={`transition-opacity duration-1000 ${
+        isVisible ? 'opacity-100 animate-fadeInUp' : 'opacity-0'
+      }`}
+      style={stagger ? { animationDelay: `${index * 0.2}s` } : {}}
+    >
+      {children}
+    </div>
+  );
+};
+
 // Tutor Card Component with typed props
-const TutorCard: React.FC<{ tutor: Tutor }> = ({ tutor }) => {
+const TutorCard: React.FC<{ tutor: Tutor; index: number; scale?: number }> = ({ tutor, index, scale = 1 }) => {
   const router = useRouter();
+  const [imageFailed, setImageFailed] = useState(false);
 
   const handleClick = () => {
     router.push(`/tutor/${tutor.id}`);
   };
 
+  const iconSizeClass = scale >= 1 ? 'w-40 h-40' : 'w-32 h-32';
+  const textSizeClass = scale >= 1 ? 'text-lg' : 'text-base';
+  const streamSizeClass = scale >= 1 ? 'text-xs' : 'text-[10px]';
+  const starSizeClass = scale >= 1 ? 'w-4 h-4' : 'w-3 h-3';
+
   return (
-    <div
-      onClick={handleClick}
-      className="p-4 bg-white rounded-lg shadow-md cursor-pointer hover:shadow-lg transition"
-    >
-      <div className="flex items-center mb-2">
-        <FaUserCircle className="w-10 h-10 text-gray-400 mr-2" />
-        <div>
-          <h3 className="text-lg font-semibold text-gray-800">{tutor.name}</h3>
-          <p className="text-sm text-gray-500">{tutor.stream} - {tutor.section}</p>
+    <ScrollReveal stagger={true} index={index}>
+      <div
+        onClick={handleClick}
+        className="p-3 bg-white rounded-lg shadow-md w-48 flex-shrink-0 cursor-pointer hover:shadow-lg transition-all flex flex-col items-center"
+        style={{ transform: `scale(${scale})`, transformOrigin: 'center' }}
+      >
+        <div className="mb-4">
+          <div className={`${iconSizeClass} border border-gray-300 flex items-center justify-center rounded-md`}>
+            {tutor.photo && !imageFailed ? (
+              <img
+                src={tutor.photo}
+                alt={`${tutor.name}'s photo`}
+                className="w-full h-full object-contain rounded-md"
+                onError={() => setImageFailed(true)}
+              />
+            ) : (
+              <FaUserCircle className={`${iconSizeClass} text-gray-400`} />
+            )}
+          </div>
         </div>
+        <div className="flex items-center mb-2">
+          {[...Array(5)].map((_, starIndex) => (
+            <FaStar
+              key={starIndex}
+              className={`${starSizeClass} ${starIndex < Math.round(tutor.rating) ? 'text-yellow-500' : 'text-gray-300'}`}
+            />
+          ))}
+        </div>
+        <h3 className={`${textSizeClass} font-semibold text-gray-800 text-center`}>{tutor.name}</h3>
+        <p className={`${streamSizeClass} text-gray-500 text-center`}>{tutor.stream} - {tutor.section}</p>
       </div>
-      <div className="flex items-center">
-        <FaStar className="text-yellow-500 mr-1" />
-        <span className="text-gray-700">{tutor.rating.toFixed(1)}</span>
-      </div>
-    </div>
+    </ScrollReveal>
   );
 };
 
@@ -68,7 +148,8 @@ export default function Tutors() {
           name: `${tutor.firstName} ${tutor.lastName}`,
           stream: tutor.stream || 'Unknown Stream',
           section: tutor.section || 'Unknown Section',
-          rating: Math.random() * (5 - 4) + 4, // Mock rating
+          rating: Math.random() * (5 - 4) + 4,
+          photo: tutor.picture || undefined,
         }));
         setTutors(transformedTutors);
       } else {
@@ -84,7 +165,7 @@ export default function Tutors() {
 
   useEffect(() => {
     fetchTutors();
-  }, [keyword]); // Refetch when keyword changes
+  }, [keyword]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setKeyword(e.target.value);
@@ -92,6 +173,22 @@ export default function Tutors() {
 
   return (
     <div className="min-h-screen bg-gray-100">
+      <style jsx global>{`
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(40px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        .animate-fadeInUp {
+          animation: fadeInUp 1.2s ease-out forwards;
+        }
+      `}</style>
+
       {/* Header */}
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
@@ -106,71 +203,77 @@ export default function Tutors() {
       </header>
 
       {/* Tutors Section */}
-      <section className="bg-white">
-        <div className="max-w-7xl mx-auto px-4 py-12">
-          <h2 className="text-3xl font-bold text-gray-800 text-center mb-8">All Tutors</h2>
+      <ScrollReveal>
+        <section className="bg-white">
+          <div className="max-w-7xl mx-auto px-4 py-12">
+            <h2 className="text-3xl font-bold text-gray-800 text-center mb-8">All Tutors</h2>
 
-          {/* Search Bar */}
-          <div className="mb-8 flex justify-center">
-            <input
-              type="text"
-              placeholder="Search by name, section, or subject..."
-              value={keyword}
-              onChange={handleSearchChange}
-              className="w-full max-w-md px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600"
-            />
-          </div>
+            {/* Search Bar */}
+            <div className="mb-8 flex justify-center">
+              <input
+                type="text"
+                placeholder="Search by name, section, or subject..."
+                value={keyword}
+                onChange={handleSearchChange}
+                className="w-full max-w-md px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600"
+              />
+            </div>
 
-          {error && <p className="text-red-500 text-center mb-4">{error}</p>}
-          {loading && <p className="text-gray-600 text-center mb-4">Loading tutors...</p>}
-          {!loading && tutors.length === 0 && !error && (
-            <p className="text-gray-600 text-center mb-4">No tutors found.</p>
-          )}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {tutors.map(tutor => (
-              <TutorCard key={tutor.id} tutor={tutor} />
-            ))}
+            {error && <p className="text-red-500 text-center mb-4">{error}</p>}
+            {loading && <p className="text-gray-600 text-center mb-4">Loading tutors...</p>}
+            {!loading && tutors.length === 0 && !error && (
+              <p className="text-gray-600 text-center mb-4">No tutors found.</p>
+            )}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {tutors.map((tutor, index) => (
+                <div key={tutor.id} className="flex justify-center">
+                  <TutorCard tutor={tutor} index={index} />
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </ScrollReveal>
 
       {/* Footer */}
-      <footer className="bg-green-700 text-white">
-        <div className="max-w-7xl mx-auto px-4 py-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div>
-              <h4 className="text-lg font-semibold mb-4">TutorMatch</h4>
-              <p>Who We Are</p>
-              <p>The Mission</p>
-              <p>Our Blog</p>
-            </div>
-            <div>
-              <h4 className="text-lg font-semibold mb-4">Join the Community</h4>
-              <p>Students</p>
-              <p>Tutors</p>
-              <p>Partners</p>
-            </div>
-            <div>
-              <h4 className="text-lg font-semibold mb-4">Support</h4>
-              <p>Help Center</p>
-              <p>Contact Us</p>
-              <p>FAQs</p>
-            </div>
-            <div>
-              <h4 className="text-lg font-semibold mb-4">Download the App</h4>
-              <div className="flex space-x-4">
-                <a href="#" className="text-white">
-                  <img src="https://via.placeholder.com/120x40?text=App+Store" alt="App Store" />
-                </a>
-                <a href="#" className="text-white">
-                  <img src="https://via.placeholder.com/120x40?text=Google+Play" alt="Google Play" />
-                </a>
+      <ScrollReveal>
+        <footer className="bg-green-700 text-white">
+          <div className="max-w-7xl mx-auto px-4 py-8">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+              <div>
+                <h4 className="text-lg font-semibold mb-4">TutorMatch</h4>
+                <p>Who We Are</p>
+                <p>The Mission</p>
+                <p>Our Blog</p>
+              </div>
+              <div>
+                <h4 className="text-lg font-semibold mb-4">Join the Community</h4>
+                <p>Students</p>
+                <p>Tutors</p>
+                <p>Partners</p>
+              </div>
+              <div>
+                <h4 className="text-lg font-semibold mb-4">Support</h4>
+                <p>Help Center</p>
+                <p>Contact Us</p>
+                <p>FAQs</p>
+              </div>
+              <div>
+                <h4 className="text-lg font-semibold mb-4">Download the App</h4>
+                <div className="flex space-x-4">
+                  <a href="#" className="text-white">
+                    <img src="https://via.placeholder.com/120x40?text=App+Store" alt="App Store" />
+                  </a>
+                  <a href="#" className="text-white">
+                    <img src="https://via.placeholder.com/120x40?text=Google+Play" alt="Google Play" />
+                  </a>
+                </div>
               </div>
             </div>
+            <p className="text-center mt-8">© 2025 TutorMatch</p>
           </div>
-          <p className="text-center mt-8">© 2025 TutorMatch</p>
-        </div>
-      </footer>
+        </footer>
+      </ScrollReveal>
     </div>
   );
 }

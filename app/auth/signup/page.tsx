@@ -12,7 +12,7 @@ import {
   FaCheck 
 } from 'react-icons/fa';
 
-// Define the shape of formData
+
 interface FormData {
   firstName: string;
   lastName: string;
@@ -21,7 +21,7 @@ interface FormData {
   password: string;
 }
 
-// Define the shape of errors
+
 interface Errors {
   firstName?: string;
   lastName?: string;
@@ -31,7 +31,7 @@ interface Errors {
   form?: string;
 }
 
-// Define the shape of password strength
+
 interface PasswordStrength {
   score: number;
   hasLength: boolean;
@@ -39,7 +39,7 @@ interface PasswordStrength {
   hasNumber: boolean;
 }
 
-// Initial form data
+
 const formDataInitial: FormData = {
   firstName: '',
   lastName: '',
@@ -48,10 +48,10 @@ const formDataInitial: FormData = {
   password: ''
 };
 
-// Initial errors
+
 const errorsInitial: Errors = {};
 
-// Initial password strength
+
 const passwordStrengthInitial: PasswordStrength = {
   score: 0,
   hasLength: false,
@@ -59,24 +59,23 @@ const passwordStrengthInitial: PasswordStrength = {
   hasNumber: false
 };
 
-// Component
 const TuitionFinderRegistration: React.FC = () => {
-  // Form state
+
   const [formData, setFormData] = useState<FormData>(formDataInitial);
   
-  // Error state
+  
   const [errors, setErrors] = useState<Errors>(errorsInitial);
   
-  // Password visibility
+
   const [showPassword, setShowPassword] = useState<boolean>(false);
   
-  // Password strength
+
   const [passwordStrength, setPasswordStrength] = useState<PasswordStrength>(passwordStrengthInitial);
   
-  // Handle input change
+
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
-    // Ensure id is a key of FormData
+   
     if (id in formData) {
       setFormData({
         ...formData,
@@ -84,7 +83,7 @@ const TuitionFinderRegistration: React.FC = () => {
       });
     }
     
-    // Clear error when user types
+
     if (id in errors && errors[id as keyof Errors]) {
       setErrors({
         ...errors,
@@ -93,7 +92,7 @@ const TuitionFinderRegistration: React.FC = () => {
     }
   };
   
-  // Update password strength meter
+
   useEffect(() => {
     if (formData.password) {
       const hasLength = formData.password.length >= 8;
@@ -116,25 +115,23 @@ const TuitionFinderRegistration: React.FC = () => {
     }
   }, [formData.password]);
   
-  // Form validation
+
   const validateForm = (): boolean => {
     const newErrors: Errors = {};
-    
-    // Check required fields
+
     if (!formData.firstName.trim()) newErrors.firstName = 'Please enter your first name';
     if (!formData.lastName.trim()) newErrors.lastName = 'Please enter your last name';
-    
-    // Validate email
+
     if (!formData.email.trim()) {
       newErrors.email = 'Please enter your email address';
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       newErrors.email = 'Please enter a valid email address';
     }
     
-    // Check DOB
+
     if (!formData.dob) newErrors.dob = 'Please enter your date of birth';
     
-    // Check password
+
     if (!formData.password) {
       newErrors.password = 'Please enter a password';
     } else if (formData.password.length < 8) {
@@ -144,8 +141,7 @@ const TuitionFinderRegistration: React.FC = () => {
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-  
-  // Handle form submission
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (validateForm()) {
@@ -167,12 +163,12 @@ const TuitionFinderRegistration: React.FC = () => {
         const data = await response.json();
 
         if (!response.ok) {
-          // Check if the backend returned specific field errors or a general form error
+          
           if (data.errors) {
             if (data.errors.form) {
               throw new Error(data.errors.form);
             } else if (data.errors.email) {
-              throw new Error(data.errors.email); // Specific error for email (e.g., "User already exists")
+              throw new Error(data.errors.email); 
             } else {
               throw new Error('Failed to register: ' + JSON.stringify(data.errors));
             }
@@ -188,7 +184,7 @@ const TuitionFinderRegistration: React.FC = () => {
     }
   };
   
-  // Get strength meter color
+ 
   const getStrengthColor = (): string => {
     if (passwordStrength.score < 33) return 'bg-red-500';
     if (passwordStrength.score < 67) return 'bg-yellow-500';

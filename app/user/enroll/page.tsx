@@ -11,6 +11,7 @@ interface Tutor {
   rating: number;
   contactNumber: string;
   email: string;
+  picture?: string;
   subject: { name: string; place: string }[];
 }
 
@@ -118,6 +119,7 @@ export default function EnrollmentPage() {
             rating: rating ? parseFloat(rating) : (Math.random() * (5 - 4) + 4),
             contactNumber: contactNumber ? decodeURIComponent(contactNumber) : data.tutor.contactNumber,
             email: email ? decodeURIComponent(email) : data.tutor.email,
+            picture: data.tutor.picture || "https://img.icons8.com/?size=100&id=WNS8XGkd1Rhp&format=png&color=000000", // Fallback to a user icon
             subject: data.tutor.subject || [], // Ensure subject is always an array
           };
           setTutor(transformedTutor);
@@ -295,36 +297,43 @@ export default function EnrollmentPage() {
         )}
 
         {tutor && (
-          <div className="bg-white p-6 rounded-lg shadow-md mb-6">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">
-              Enroll with {tutor.firstName} {tutor.lastName}
-            </h2>
-            <p className="text-gray-600 mb-2">
-              <strong>Description:</strong> {tutor.description}
-            </p>
-            <p className="text-gray-600 mb-2">
-              <strong>Rating:</strong> {tutor.rating.toFixed(1)}
-            </p>
-            <p className="text-gray-600 mb-2">
-              <strong>Contact:</strong> {tutor.contactNumber}
-            </p>
-            <p className="text-gray-600 mb-2">
-              <strong>Email:</strong> {tutor.email}
-            </p>
-            {tutor.subject.length > 0 && (
-              <div>
-                <p className="text-gray-600 mb-2">
-                  <strong>Subjects:</strong>
-                </p>
-                <ul className="list-disc list-inside">
-                  {tutor.subject.map((subj, index) => (
-                    <li key={index} className="text-gray-600">
-                      {subj.name} ({subj.place})
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
+          <div className="bg-white p-6 rounded-lg shadow-md mb-6 flex items-start space-x-4">
+            <img
+              src={tutor.picture}
+              alt={`${tutor.firstName} ${tutor.lastName}`}
+              className="w-16 h-16 rounded-full object-cover"
+            />
+            <div>
+              <h2 className="text-2xl font-bold text-gray-800 mb-4">
+                Enroll with {tutor.firstName} {tutor.lastName}
+              </h2>
+              <p className="text-gray-600 mb-2">
+                <strong>Description:</strong> {tutor.description}
+              </p>
+              <p className="text-gray-600 mb-2">
+                <strong>Rating:</strong> {tutor.rating.toFixed(1)}
+              </p>
+              <p className="text-gray-600 mb-2">
+                <strong>Contact:</strong> {tutor.contactNumber}
+              </p>
+              <p className="text-gray-600 mb-2">
+                <strong>Email:</strong> {tutor.email}
+              </p>
+              {tutor.subject.length > 0 && (
+                <div>
+                  <p className="text-gray-600 mb-2">
+                    <strong>Subjects:</strong>
+                  </p>
+                  <ul className="list-disc list-inside">
+                    {tutor.subject.map((subj, index) => (
+                      <li key={index} className="text-gray-600">
+                        {subj.name} ({subj.place})
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
           </div>
         )}
 

@@ -1,15 +1,16 @@
 import NextAuth from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
-import { dbConnect } from '../../../../lib/db/models/mongodb';
 import user from '../../../../lib/db/models/user';
+import { dbConnect } from '../../../../lib/db/models/mongodb';
+import bcrypt from 'bcryptjs';
 
-const authOptions = {
+export const authOptions = {
   providers: [
     CredentialsProvider({
       name: 'Credentials',
       credentials: {
-        email: { label: 'Email', type: 'email' },
-        password: { label: 'Password', type: 'password' },
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
@@ -17,48 +18,39 @@ const authOptions = {
         }
 
         await dbConnect();
-
-        const existingUser = await user.findOne({ email: credentials.email });
-        if (!existingUser) {
+        
+        const User = await user.findOne({ email: credentials.email });
+        
+        if (!User) {
           throw new Error('No user found with this email');
         }
-
-        const isValid = await existingUser.comparePassword(credentials.password);
-        if (!isValid) {
+        
+        const isValidPassword = await bcrypt.compare(credentials.password, User.password);
+        if (!isValidPassword) {
           throw new Error('Invalid password');
         }
 
         return {
-          id: existingUser._id.toString(),
-          name: existingUser.name,
-          email: existingUser.email,
+          id: User._id,
+          email: User.email,
+          name: `${User.firstName} ${User.lastName}`,
         };
-      },
+      }
     }),
   ],
-  session: {
-    strategy: 'jwt',
-  },
-  callbacks: {
-    async jwt({ token, user }) {
-      if (user) {
-        token.id = user.id;
-      }
-      return token;
-    },
-    async session({ session, token }) {
-      if (session.user && token.id) {
-        session.user.id = token.id;
-      }
-      return session;
-    },
-  },
   pages: {
     signIn: '/auth/login',
   },
-  secret: process.env.NEXTAUTH_SECRET,
+  callbacks: {
+    async redirect({ url, baseUrl }) {
+      return baseUrl + '/dashboard';
+    },
+    async session({ session, token }) {
+      session.user.id = token.sub;
+      return session;
+    },
+  },
 };
 
 const handler = NextAuth(authOptions);
-
 export { handler as GET, handler as POST };

@@ -1,31 +1,51 @@
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "../[...nextauth]";
+import { authOptions } from "../[...nextauth]/route";
+import { dbConnect } from "../../../../lib/db/models/mongodb";
+import user from "../../../../lib/db/models/user";
 
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);
 
     if (!session || !session.user) {
-      return new Response(JSON.stringify({ success: false, error: "Not authenticated" }), {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
         headers: { "Content-Type": "application/json" },
       });
     }
 
-    // Return the user details in the expected format
-    const user = {
-      id: session.user.id || "unknown",
-      name: session.user.name || "Unknown User",
-      email: session.user.email || "",
-    };
+    await dbConnect();
 
-    return new Response(JSON.stringify({ success: true, user }), {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-    });
+    const userData = await user.findById(session.user.id).lean();
+
+    if (!userData) {
+      return new Response(JSON.stringify({ error: "User not found" }), {
+        status: 404,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
+    return new Response(
+      JSON.stringify({
+        success: true, // Add success field
+        user: {
+          id: userData._id.toString(),
+          name: `${userData.firstName} ${userData.lastName}`,
+          firstName: userData.firstName,
+          lastName: userData.lastName,
+          email: userData.email,
+          dob: userData.dob ? userData.dob.toISOString() : null,
+          enrollments: userData.enrollments || [],
+        },
+      }),
+      {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
   } catch (error) {
-    console.error("Error fetching user:", error);
-    return new Response(JSON.stringify({ success: false, error: "Server error" }), {
+    console.error("Error in /api/auth/user:", error);
+    return new Response(JSON.stringify({ error: "Internal Server Error" }), {
       status: 500,
       headers: { "Content-Type": "application/json" },
     });

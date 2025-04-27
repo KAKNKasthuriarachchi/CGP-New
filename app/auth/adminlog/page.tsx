@@ -14,20 +14,18 @@ import {
   faEyeSlash,
   faShieldAlt
 } from '@fortawesome/free-solid-svg-icons';
-import Link from 'next/link'; // Added for client-side routing
+import Link from 'next/link'; 
 
-// Define the shape of formData
 interface FormData {
   username: string;
   password: string;
   remember: boolean;
 }
 
-// Define the shape of errors
 interface Errors {
   username: boolean;
   password: boolean;
-  form?: string; // Added for API errors
+  form?: string; 
 }
 
 export default function AdminLogin() {
@@ -46,7 +44,7 @@ export default function AdminLogin() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
-    // Ensure name is a key of FormData
+   
     if (name in formData) {
       setFormData({
         ...formData,
@@ -86,7 +84,6 @@ export default function AdminLogin() {
     
     if (valid) {
       try {
-        // Make API call to a custom admin login endpoint
         const response = await fetch('/api/admin-login', {
           method: 'POST',
           headers: {
@@ -105,14 +102,13 @@ export default function AdminLogin() {
         }
 
         alert('Admin login successful! Redirecting to admin dashboard...');
-        setTimeout(() => window.location.href = '/admin-dashboard', 2000);
+        setTimeout(() => window.location.href = '/admin/tutor', 2000);
       } catch (err: any) {
         setErrors({ ...errors, form: err.message || 'An error occurred while logging in' });
       }
     }
   };
 
-  // Features displayed in the left panel
   const features = [
     { icon: faUsers, text: "Manage tutors and students" },
     { icon: faChartLine, text: "View analytics and reports" },
@@ -151,17 +147,17 @@ export default function AdminLogin() {
         </div>
         
         {/* Right panel */}
-        <div className="bg-white w-3/5 p-12 flex flex-col justify-center animate-[fadeIn_0.5s_ease-out]">
-          <div className="flex items-center text-2xl font-bold text-green-900 mb-8 font-serif opacity-0 animate-[fadeIn_0.4s_ease-out_forwards]">
+        <div className="bg-white w-3/5 p-12 flex flex-col justify-center">
+          <div className="flex items-center text-2xl font-bold text-green-900 mb-8 font-serif">
             <FontAwesomeIcon icon={faGraduationCap} className="mr-2 text-3xl" />
             TuitionFinder
             <span className="ml-2 bg-green-900 text-white text-xs px-2 py-1 rounded">ADMIN</span>
           </div>
           
-          <h2 className="text-3xl font-semibold mb-2 text-gray-800 opacity-0 animate-[fadeIn_0.5s_ease-out_forwards] [animation-delay:0.1s]">Admin Login</h2>
-          <p className="text-gray-600 text-base mb-8 opacity-0 animate-[fadeIn_0.5s_ease-out_forwards] [animation-delay:0.1s]">Enter your admin credentials to access the dashboard</p>
+          <h2 className="text-3xl font-semibold mb-2 text-gray-800">Admin Login</h2>
+          <p className="text-gray-600 text-base mb-8">Enter your admin credentials to access the dashboard</p>
           
-          <div className="flex items-center bg-green-900/10 p-4 rounded-lg mb-6 opacity-0 animate-[fadeIn_0.5s_ease-out_forwards] [animation-delay:0.2s]">
+          <div className="flex items-center bg-green-900/10 p-4 rounded-lg mb-6">
             <FontAwesomeIcon icon={faShieldAlt} className="text-green-900 text-xl mr-4" />
             <p className="text-sm text-gray-800">This is a secure area for authorized personnel only. All login attempts are logged.</p>
           </div>
@@ -169,7 +165,7 @@ export default function AdminLogin() {
           {errors.form && <p className="text-red-500 text-center mb-4">{errors.form}</p>}
           
           <form onSubmit={handleSubmit}>
-            <div className="mb-6 relative opacity-0 animate-[fadeIn_0.5s_ease-out_forwards] [animation-delay:0.3s]">
+            <div className="mb-6 relative">
               <div className="relative">
                 <FontAwesomeIcon 
                   icon={faUser} 
@@ -196,7 +192,7 @@ export default function AdminLogin() {
               {errors.username && <div className="text-red-500 text-xs mt-1">Please enter your admin username</div>}
             </div>
             
-            <div className="mb-6 relative opacity-0 animate-[fadeIn_0.5s_ease-out_forwards] [animation-delay:0.4s]">
+            <div className="mb-6 relative">
               <div className="relative">
                 <FontAwesomeIcon 
                   icon={faLock} 
@@ -228,7 +224,7 @@ export default function AdminLogin() {
               {errors.password && <div className="text-red-500 text-xs mt-1">Please enter your password</div>}
             </div>
             
-            <div className="flex justify-between items-center mb-6 opacity-0 animate-[fadeIn_0.5s_ease-out_forwards] [animation-delay:0.5s]">
+            <div className="flex justify-between items-center mb-6">
               <div className="flex items-center">
                 <input
                   type="checkbox"
@@ -245,14 +241,14 @@ export default function AdminLogin() {
             
             <button
               type="submit"
-              className="w-full py-4 bg-gradient-to-r from-green-600 to-green-900 text-white font-semibold rounded-lg hover:translate-y-[-2px] hover:shadow-lg transition-all active:translate-y-0 text-base mb-6 opacity-0 animate-[fadeIn_0.5s_ease-out_forwards] [animation-delay:0.6s]"
+              className="w-full py-4 bg-gradient-to-r from-green-600 to-green-900 text-white font-semibold rounded-lg hover:translate-y-[-2px] hover:shadow-lg transition-all active:translate-y-0 text-base mb-6"
             >
               ADMIN LOGIN
             </button>
           </form>
           
-          <div className="text-center text-gray-600 text-sm mt-6 opacity-0 animate-[fadeIn_0.5s_ease-out_forwards] [animation-delay:0.7s]">
-            <Link href="/login" className="text-green-900 font-semibold hover:underline">User Login</Link> |{' '}
+          <div className="text-center text-gray-600 text-sm mt-6">
+            <Link href="/auth/login" className="text-green-900 font-semibold hover:underline">User Login</Link> |{' '}
             <Link href="/signup" className="text-green-900 font-semibold hover:underline">Registration</Link> |{' '}
             <Link href="#" className="text-green-900 font-semibold hover:underline">Help & Support</Link>
           </div>

@@ -1,101 +1,83 @@
-// app/(auth)/login/page.tsx     ← or wherever you keep route pages
-"use client";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "../auth/[...nextauth]/route";
+import { dbConnect } from "../../../lib/db/models/mongodb";
+import user from "../../../lib/db/models/user";
+import adminTutor from "../../../lib/db/models/adminTutor";
 
-import { useState } from "react";
-import Image from "next/image";
+export async function POST(request) {
+  try {
+    // Get the session to verify the user is authenticated
+    const session = await getServerSession(authOptions);
 
-export default function LoginPage() {
-  const [show, setShow] = useState(false);
+    if (!session || !session.user) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
 
-  return (
-    <div className="relative flex h-screen w-full items-center justify-center overflow-hidden">
-      {/* background image with subtle overlay */}
-      <Image
-        src="/img/bg.jpg"
-        alt="Background"
-        fill
-        priority
-        className="object-cover"
-      />
-      <span className="absolute inset-0 bg-white/60 backdrop-blur-[2px]" />
+    // Parse the request body
+    const { tutorId, studentId, tutorName, subject, place } = await request.json();
 
-      {/* login card */}
-      <div className="relative z-10 w-80 rounded-2xl bg-white p-8 shadow-lg">
-        {/* logo */}
-        <div className="mb-4 flex items-center gap-2">
-          <Image
-            src="https://img.icons8.com/ios-filled/50/4CAF50/graduation-cap.png"
-            alt="Logo"
-            width={30}
-            height={30}
-          />
-          <span className="text-lg font-bold text-green-600">
-            TuitionFinder
-          </span>
-        </div>
+    if (!tutorId || !studentId || !tutorName || !subject || !place) {
+      return new Response(JSON.stringify({ error: "Missing required fields" }), {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
 
-        <h2 className="mb-5 text-base font-semibold text-[#111d3c]">
-          LOGIN TO YOUR ACCOUNT
-        </h2>
+    // Ensure the studentId matches the logged-in user
+    if (studentId !== session.user.id) {
+      return new Response(JSON.stringify({ error: "Invalid student ID" }), {
+        status: 403,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
 
-        <form className="flex flex-col text-sm">
-          {/* email */}
-          <label htmlFor="email" className="mb-1">
-            Email Address&nbsp;:
-          </label>
-          <input
-            id="email"
-            name="email"
-            type="email"
-            required
-            className="mb-4 rounded-xl border-2 border-black p-2 text-sm outline-none focus:ring-2 focus:ring-green-500"
-          />
+    // Connect to the database
+    await dbConnect();
 
-          {/* password */}
-          <label htmlFor="password" className="mb-1">
-            Password&nbsp;:
-          </label>
-          <div className="relative mb-1">
-            <input
-              id="password"
-              name="password"
-              type={show ? "text" : "password"}
-              required
-              className="w-full rounded-xl border-2 border-black p-2 text-sm outline-none focus:ring-2 focus:ring-green-500"
-            />
-            <button
-              type="button"
-              onClick={() => setShow(!show)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 select-none text-lg"
-            >
-              &#128065;
-            </button>
-          </div>
+    // Fetch the tutor's picture
+    const tutor = await adminTutor.findById(tutorId).lean();
+    if (!tutor) {
+      return new Response(JSON.stringify({ error: "Tutor not found" }), {
+        status: 404,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
 
-          {/* forgot link */}
-          <div className="mb-4 text-left text-xs">
-            <a href="#" className="hover:underline">
-              Forget <strong>Password?</strong>
-            </a>
-          </div>
+    // Update the user's enrollments with the tutor's picture
+    const updatedUser = await user.findOneAndUpdate(
+      { _id: studentId },
+      {
+        $push: {
+          enrollments: {
+            tutorName,
+            subject,
+            place,
+            tutorPicture: tutor.picture,
+          },
+        },
+      },
+      { new: true }
+    );
 
-          {/* submit */}
-          <button
-            type="submit"
-            className="mb-4 w-full rounded-full bg-green-600 py-3 text-sm font-bold text-white transition hover:bg-green-700"
-          >
-            LOGIN
-          </button>
+    if (!updatedUser) {
+      return new Response(JSON.stringify({ error: "User not found" }), {
+        status: 404,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
 
-          {/* register link */}
-          <p className="text-center text-xs">
-            Don’t have an account?{" "}
-            <a href="#" className="font-semibold text-green-600 hover:underline">
-              Register now
-            </a>
-          </p>
-        </form>
-      </div>
-    </div>
-  );
+    return new Response(JSON.stringify({ message: "Enrollment successful!" }), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
+  } catch (error) {
+    console.error("Error in /api/enroll:", error);
+    return new Response(JSON.stringify({ error: "Internal Server Error" }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
 }

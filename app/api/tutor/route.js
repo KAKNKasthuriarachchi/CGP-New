@@ -118,13 +118,33 @@ export async function POST(request) {
       !contactNumber ||
       !section ||
       !stream ||
-      !subject ||
+      !Array.isArray(subject) ||
+      subject.length === 0 ||
       !picture ||
       !qualifications ||
       !description
     ) {
       return NextResponse.json(
         { success: false, error: "All fields are required" },
+        { status: 400 }
+      );
+    }
+
+    // Validate subject array
+    for (const sub of subject) {
+      if (!sub.name || !sub.place) {
+        return NextResponse.json(
+          { success: false, error: "Each subject must have a name and place" },
+          { status: 400 }
+        );
+      }
+    }
+
+    // Validate picture URL (basic check to ensure it looks like a Cloudinary URL)
+    const urlPattern = /^https:\/\/res\.cloudinary\.com\/[a-zA-Z0-9_-]+\/image\/upload\/.+$/;
+    if (!urlPattern.test(picture)) {
+      return NextResponse.json(
+        { success: false, error: "Invalid picture URL. It must be a valid Cloudinary URL." },
         { status: 400 }
       );
     }
@@ -147,7 +167,7 @@ export async function POST(request) {
       section,
       stream,
       subject,
-      picture,
+      picture, // Save the Cloudinary URL
       qualifications,
       description,
     });

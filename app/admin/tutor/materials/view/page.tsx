@@ -81,7 +81,7 @@ function ViewTutorMaterialsPage() {
   };
 
   const handleBackToAdd = () => {
-    router.push('/admin/tutor/materials/add');
+    router.push('/admin/tutor/materials');
   };
 
   return (

@@ -3,16 +3,16 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { Eye, EyeOff, Mail, Lock, User, GraduationCap, Apple, Facebook } from 'lucide-react';
-import { signIn } from 'next-auth/react'; // Added for next-auth integration
+import { signIn } from 'next-auth/react';
 
-// Define the shape of formData
+
 interface FormData {
   email: string;
   password: string;
   remember: boolean;
 }
 
-// Define the shape of errors
+
 interface Errors {
   email: boolean;
   password: boolean;
@@ -33,7 +33,7 @@ export default function LoginPage() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
-    // Ensure name is a key of FormData
+  
     if (name in formData) {
       setFormData({
         ...formData,
@@ -41,7 +41,7 @@ export default function LoginPage() {
       });
     }
 
-    // Clear errors when typing
+  
     if (name in errors && errors[name as keyof Errors]) {
       setErrors({
         ...errors,
@@ -82,19 +82,18 @@ export default function LoginPage() {
 
     if (valid) {
       try {
-        // Use next-auth's signIn function to authenticate
+       
         const result = await signIn('credentials', {
           email: formData.email,
           password: formData.password,
-          redirect: false, // We'll handle the redirect manually if needed
+          redirect: true, 
         });
 
         if (result?.error) {
           throw new Error(result.error || 'Failed to log in');
         }
 
-        // next-auth will redirect to /dashboard automatically via the redirect callback
-        // No need for manual redirect or alert
+    
       } catch (err: any) {
         setErrors({ ...errors, form: err.message || 'An error occurred while logging in' });
       }
@@ -232,9 +231,9 @@ export default function LoginPage() {
           </form>
           
           <div className="text-center text-gray-500 text-sm mt-6">
-            Don't have an account? <Link href="/signup" className="text-green-700 font-semibold hover:underline">Sign Up</Link>
+            Don't have an account? <Link href="/auth/signup" className="text-green-700 font-semibold hover:underline">Sign Up</Link>
             <span className="mx-2">|</span>
-            <Link href="#" className="text-green-700 font-semibold hover:underline">Admin Login</Link>
+            <Link href="/auth/adminlog" className="text-green-700 font-semibold hover:underline">Admin Login</Link>
           </div>
         </div>
       </div>
