@@ -7,7 +7,6 @@ import {
   faChartLine, 
   faCog, 
   faClipboardList, 
-  faGraduationCap, 
   faUser, 
   faLock,
   faEye,
@@ -117,16 +116,105 @@ export default function AdminLogin() {
   ];
 
   return (
-    <div className="min-h-screen flex justify-center items-center p-5 bg-cover relative"
-         style={{ backgroundImage: "url('https://static.vecteezy.com/system/resources/previews/001/898/535/non_2x/books-and-stationery-on-the-desk-free-photo.jpg')" }}>
-      {/* Background overlay with blur */}
-      <div className="fixed inset-0 bg-cover bg-center blur-md z-0"
-           style={{ backgroundImage: "url('https://static.vecteezy.com/system/resources/previews/001/898/535/non_2x/books-and-stationery-on-the-desk-free-photo.jpg')" }}>
+    <div className="min-h-screen flex justify-center items-center p-5 relative">
+      {/* Background Shapes with Rise Animation */}
+      <style jsx global>{`
+        @keyframes rise {
+          0% {
+            transform: translateY(100vh);
+            opacity: 0;
+          }
+          10% {
+            opacity: 0.5;
+          }
+          90% {
+            opacity: 0.5;
+          }
+          100% {
+            transform: translateY(-100vh);
+            opacity: 0;
+          }
+        }
+        .shape {
+          transform: translateY(100vh);
+          opacity: 0;
+        }
+        .animate-rise {
+          animation: rise 5s linear infinite;
+        }
+        .animate-rise-delay-1 {
+          animation: rise 5s linear infinite;
+          animation-delay: 0.5s;
+        }
+        .animate-rise-delay-2 {
+          animation: rise 5s linear infinite;
+          animation-delay: 1s;
+        }
+        .animate-rise-delay-3 {
+          animation: rise 5s linear infinite;
+          animation-delay: 1.5s;
+        }
+        .animate-rise-delay-4 {
+          animation: rise 5s linear infinite;
+          animation-delay: 2s;
+        }
+        .animate-rise-delay-5 {
+          animation: rise 5s linear infinite;
+          animation-delay: 2.5s;
+        }
+        .animate-rise-delay-6 {
+          animation: rise 5s linear infinite;
+          animation-delay: 3s;
+        }
+        .animate-rise-delay-7 {
+          animation: rise 5s linear infinite;
+          animation-delay: 3.5s;
+        }
+        .animate-rise-delay-8 {
+          animation: rise 5s linear infinite;
+          animation-delay: 4s;
+        }
+        .animate-rise-delay-9 {
+          animation: rise 5s linear infinite;
+          animation-delay: 4.5s;
+        }
+        .animate-rise-delay-10 {
+          animation: rise 5s linear infinite;
+          animation-delay: 5s;
+        }
+        .animate-rise-delay-11 {
+          animation: rise 5s linear infinite;
+          animation-delay: 5.5s;
+        }
+      `}</style>
+
+      <div className="fixed inset-0 -z-10 bg-white">
+        {/* Green Shapes with Rise Animation */}
+        <div className="absolute left-10 w-24 h-24 bg-green-500/50 rounded-full shape animate-rise"></div>
+        <div className="absolute right-20 w-32 h-32 bg-green-500/35 rounded-full shape animate-rise-delay-1"></div>
+        <div className="absolute right-1/4 w-16 h-16 bg-green-500/60 rounded-full shape animate-rise-delay-2"></div>
+        <div className="absolute left-1/3 w-20 h-20 bg-green-500/40 rounded-full shape animate-rise-delay-3"></div>
+        <div className="absolute left-1/4 w-12 h-12 bg-green-500/25 rounded-full shape animate-rise-delay-4"></div>
+        <div className="absolute right-1/3 w-28 h-28 bg-green-500/55 rounded-full shape animate-rise-delay-5"></div>
+        <div className="absolute left-1/2 w-20 h-20 bg-green-500/40 rounded-full shape animate-rise-delay-6"></div>
+        <div className="absolute left-10 w-14 h-14 bg-green-500/35 rounded-full shape animate-rise-delay-7"></div>
+        <div className="absolute right-5 w-20 h-20 bg-green-500/50 rounded-full shape animate-rise-delay-8"></div>
+        <div className="absolute right-10 w-14 h-14 bg-green-500/45 rounded-full shape animate-rise-delay-9"></div>
+        <div className="absolute right-1/3 w-16 h-16 bg-green-500/40 rounded-full shape animate-rise-delay-10"></div>
+        <div className="absolute right-10 w-18 h-18 bg-green-500/35 rounded-full shape animate-rise-delay-11"></div>
       </div>
       
       <div className="flex w-full max-w-5xl rounded-2xl overflow-hidden shadow-2xl z-10 min-h-[550px]">
         {/* Left panel */}
-        <div className="relative bg-gradient-to-b from-green-900 to-green-600 w-2/5 flex flex-col justify-end p-10 text-white">
+        <div 
+          className="relative w-2/5 flex flex-col justify-end p-10 text-white"
+          style={{ 
+            backgroundImage: "url('/duo1.jpeg'), linear-gradient(to bottom, rgba(21, 128, 61, 0.8), rgba(16, 185, 129, 0.6))",
+            backgroundSize: 'cover, auto',
+            backgroundPosition: 'center, center',
+            backgroundRepeat: 'no-repeat, no-repeat'
+          }}
+        >
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-black/20 z-10"></div>
           
           <div className="relative z-20">
@@ -148,9 +236,9 @@ export default function AdminLogin() {
         
         {/* Right panel */}
         <div className="bg-white w-3/5 p-12 flex flex-col justify-center">
-          <div className="flex items-center text-2xl font-bold text-green-900 mb-8 font-serif">
-            <FontAwesomeIcon icon={faGraduationCap} className="mr-2 text-3xl" />
-            TuitionFinder
+          <div className="flex items-center text-2xl font-bold text-green-700 mb-8 font-serif">
+            <img src="/logo.ico" alt="App Logo" className="w-7 h-7 mr-2" />
+            TutorMart
             <span className="ml-2 bg-green-900 text-white text-xs px-2 py-1 rounded">ADMIN</span>
           </div>
           
@@ -175,15 +263,15 @@ export default function AdminLogin() {
                   type="text"
                   id="username"
                   name="username"
-                  className={`w-full py-4 pl-12 pr-4 border rounded-lg bg-gray-50 focus:border-green-600 focus:outline-none focus:ring-2 focus:ring-green-900/20 focus:bg-white transition-all ${errors.username ? 'border-red-500' : 'border-gray-200'}`}
+                  className={`w-full py-3 pl-10 pr-4 border rounded-3xl bg-white focus:outline-none focus:border-green-500 focus:bg-white transition-all shadow-sm hover:shadow-md hover:border-green-600 ${errors.username ? 'border-red-500' : 'border-gray-200'}`}
                   placeholder=" "
                   value={formData.username}
                   onChange={handleChange}
                 />
                 <label
                   htmlFor="username"
-                  className={`absolute left-12 transition-all duration-300 pointer-events-none text-gray-500 ${
-                    formData.username ? 'text-xs -top-2 left-4 bg-white px-1 text-green-900' : 'top-4'
+                  className={`absolute left-10 transition-all pointer-events-none ${
+                    formData.username ? 'text-xs -top-2 left-4 bg-white px-1 text-green-700' : 'top-3 text-gray-500'
                   }`}
                 >
                   Admin Username
@@ -202,15 +290,15 @@ export default function AdminLogin() {
                   type={passwordVisible ? "text" : "password"}
                   id="password"
                   name="password"
-                  className={`w-full py-4 pl-12 pr-10 border rounded-lg bg-gray-50 focus:border-green-600 focus:outline-none focus:ring-2 focus:ring-green-900/20 focus:bg-white transition-all ${errors.password ? 'border-red-500' : 'border-gray-200'}`}
+                  className={`w-full py-3 pl-10 pr-10 border rounded-3xl bg-white focus:outline-none focus:border-green-500 focus:bg-white transition-all shadow-sm hover:shadow-md hover:border-green-600 ${errors.password ? 'border-red-500' : 'border-gray-200'}`}
                   placeholder=" "
                   value={formData.password}
                   onChange={handleChange}
                 />
                 <label
                   htmlFor="password"
-                  className={`absolute left-12 transition-all duration-300 pointer-events-none text-gray-500 ${
-                    formData.password ? 'text-xs -top-2 left-4 bg-white px-1 text-green-900' : 'top-4'
+                  className={`absolute left-10 transition-all pointer-events-none ${
+                    formData.password ? 'text-xs -top-2 left-4 bg-white px-1 text-green-700' : 'top-3 text-gray-500'
                   }`}
                 >
                   Admin Password
@@ -241,7 +329,7 @@ export default function AdminLogin() {
             
             <button
               type="submit"
-              className="w-full py-4 bg-gradient-to-r from-green-600 to-green-900 text-white font-semibold rounded-lg hover:translate-y-[-2px] hover:shadow-lg transition-all active:translate-y-0 text-base mb-6"
+              className="w-full py-3 bg-gradient-to-r from-green-600 to-green-700 text-white font-semibold rounded-3xl transition-all hover:translate-y-px hover:shadow-lg hover:scale-105 active:translate-y-0 active:scale-100 shadow-md cursor-pointer mb-6"
             >
               ADMIN LOGIN
             </button>
@@ -249,7 +337,7 @@ export default function AdminLogin() {
           
           <div className="text-center text-gray-600 text-sm mt-6">
             <Link href="/auth/login" className="text-green-900 font-semibold hover:underline">User Login</Link> |{' '}
-            <Link href="/signup" className="text-green-900 font-semibold hover:underline">Registration</Link> |{' '}
+            <Link href="/signup" className="text-green-900 font-semibold hover:underline">User Signup</Link> |{' '}
             <Link href="#" className="text-green-900 font-semibold hover:underline">Help & Support</Link>
           </div>
         </div>
