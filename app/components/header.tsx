@@ -1,4 +1,4 @@
-'use client' 
+'use client'
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
@@ -15,10 +15,11 @@ export default function Header() {
   };
 
   return (
-    <header className="bg-green-700 text-white shadow-md p-4 fixed w-full top-0 z-50"> {/* Added fixed class for sticky header */}
+    <header className="bg-green-700 text-white shadow-md p-4 fixed w-full top-0 z-50">
       <div className="container mx-auto flex justify-between items-center">
-        <h1 className="text-2xl font-bold cursor-pointer" onClick={() => router.push('/')}>
-          TutorMatch
+        <h1 className="text-2xl font-bold cursor-pointer flex items-center" onClick={() => router.push('/')}>
+          <img src="/logo1.ico" alt="TutorMart Logo" className="w-8 h-8 mr-2" />
+          TutorMart
         </h1>
         
         <nav className="flex space-x-6">
@@ -49,7 +50,7 @@ export default function Header() {
               </button>
               
               <button
-                onClick={() => router.push('/support')}
+                onClick={() => router.push('/contacts')}
                 className="text-white hover:text-green-200 focus:outline-none flex items-center gap-2"
               >
                 <FaHeadset />

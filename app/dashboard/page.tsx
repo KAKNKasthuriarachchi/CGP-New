@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { FaUserCircle, FaStar, FaChevronLeft, FaChevronRight, FaPhone, FaEnvelope } from 'react-icons/fa';
 import { useSession } from 'next-auth/react';
-import Header from '../components/Header';
+import Header from '../components/header';
 import Footer from '../components/footer';
 
 // Define the Tutor interface

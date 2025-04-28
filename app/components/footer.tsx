@@ -73,7 +73,7 @@ export default function Footer() {
             <p className="mb-2 flex items-center">
               <FaEnvelope className="mr-2" />
               <a href="mailto:support@tutormatch.com" className="hover:text-green-200">
-                support@tutormatch.com
+                support@tutormart.com
               </a>
             </p>
             <p className="mb-2 flex items-center">

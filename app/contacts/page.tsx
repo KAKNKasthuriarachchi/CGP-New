@@ -1,7 +1,7 @@
 "use client";
 
-import Header from "../components/Header";
-import Footer from "../components/footer"; // <== Import Footer here
+import Header from "../components/header";
+import Footer from "../components/footer";
 
 import { useState } from "react";
 
@@ -25,33 +25,117 @@ export default function ContactUs() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen mx-4 mt-8 mb-8">
-      <Header /> {/* <== Add Header at the top */}
+    <div className="flex flex-col min-h-screen relative bg-white">
+      {/* Consolidated Styles */}
+      <style jsx global>{`
+        html, body {
+          background: white !important;
+          margin: 0;
+          padding: 0;
+        }
 
-      <main className="flex-grow bg-white p-8">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-20">
-          {/* Left Section */}
-          <div className="space-y-12">
-            <div className="bg-gray-100 p-6 rounded-lg shadow mb-6">
-              <h2 className="text-xl font-semibold mb-2 text-green-800">Email Us</h2>
-              <p className="break-words text-gray-600">tutormatch123@gmail.com</p>
-              <p className="mt-2 text-sm text-gray-600">Response within 24 hours</p>
-              <p className="text-sm text-gray-600">Support available in English and Sinhala</p>
-            </div>
+        @keyframes moveUp {
+          0% {
+            bottom: 0;
+            opacity: 0;
+            transform: translateX(0) scale(1);
+          }
+          20% {
+            opacity: 0.4;
+            transform: translateX(10px) scale(1.2);
+          }
+          80% {
+            opacity: 0.4;
+            transform: translateX(-10px) scale(0.8);
+          }
+          100% {
+            bottom: 100%;
+            opacity: 0;
+            transform: translateX(20px) scale(1);
+          }
+        }
+        .animate-move-up-1 {
+          animation: moveUp 5s linear infinite;
+        }
+        .animate-move-up-2 {
+          animation: moveUp 7s linear infinite;
+          animation-delay: 1s;
+        }
+        .animate-move-up-3 {
+          animation: moveUp 9s linear infinite;
+          animation-delay: 2s;
+        }
+        .animate-move-up-4 {
+          animation: moveUp 6s linear infinite;
+          animation-delay: 0.5s;
+        }
+        .animate-move-up-5 {
+          animation: moveUp 8s linear infinite;
+          animation-delay: 1.5s;
+        }
+        .animate-move-up-6 {
+          animation: moveUp 4s linear infinite;
+          animation-delay: 0.2s;
+        }
+        .animate-move-up-7 {
+          animation: moveUp 10s linear infinite;
+          animation-delay: 2.5s;
+        }
+        @keyframes fadeInUp {
+          0% {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          100% {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        .animate-fade-in-up {
+          animation: fadeInUp 0.8s ease-out forwards;
+        }
+        @keyframes inputFocus {
+          0% {
+            transform: scale(1);
+            border-color: #d1d5db;
+          }
+          100% {
+            transform: scale(1.02);
+            border-color: #15803d;
+          }
+        }
+        .animate-input-focus:focus {
+          animation: inputFocus 0.3s ease forwards;
+        }
+      `}</style>
 
-            <div className="bg-gradient-to-r from-green-300 to-blue-300 p-6 rounded-lg shadow text-white mb-6">
-              <h2 className="text-xl font-semibold mb-4">Connect With Us</h2>
-              <div className="flex space-x-4 text-2xl">
-                <a href="#" aria-label="Facebook" className="hover:text-gray-300">🌐</a>
-                <a href="#" aria-label="Twitter" className="hover:text-gray-300">🐦</a>
-                <a href="#" aria-label="LinkedIn" className="hover:text-gray-300">💼</a>
-                <a href="#" aria-label="Instagram" className="hover:text-gray-300">📸</a>
-              </div>
-            </div>
+      {/* Fallback Background Layer */}
+      <div className="fixed inset-0 bg-white z-[-2]"></div>
+
+      {/* Background with Upward-Moving Circles */}
+      <div className="fixed inset-0 z-[-1] overflow-hidden">
+        {/* Circles Moving Upwards */}
+        <span className="absolute w-16 h-16 bg-green-600/20 rounded-full left-10 bottom-0 animate-move-up-1" />
+        <span className="absolute w-24 h-24 bg-green-300/20 rounded-full left-1/4 bottom-0 animate-move-up-2" />
+        <span className="absolute w-20 h-20 bg-green-600/20 rounded-full left-1/2 bottom-0 animate-move-up-3" />
+        <span className="absolute w-18 h-18 bg-green-300/20 rounded-full right-1/4 bottom-0 animate-move-up-4" />
+        <span className="absolute w-22 h-22 bg-green-600/20 rounded-full right-10 bottom-0 animate-move-up-5" />
+        <span className="absolute w-14 h-14 bg-green-500/20 rounded-full left-1/3 bottom-0 animate-move-up-6" />
+        <span className="absolute w-26 h-26 bg-green-400/20 rounded-full right-1/3 bottom-0 animate-move-up-7" />
+      </div>
+
+      <Header />
+
+      <main className="flex-grow p-6 pt-16 bg-white relative z-[1]">
+        <div className="max-w-4xl mx-auto space-y-12">
+          {/* Page Header */}
+          <div className="text-center animate-fade-in-up" style={{ animationDelay: "0s" }}>
+            <h1 className="text-3xl font-bold text-green-800 mb-4">Contact Us</h1>
+            <p className="text-gray-600">We’re here to help! Reach out to us with any questions or inquiries.</p>
           </div>
 
-          {/* Right Section */}
-          <div className="bg-gray-50 p-8 rounded-lg shadow">
+          {/* Send us a Message Section */}
+          <div className="bg-gray-50 p-8 rounded-lg shadow-md max-w-3xl mx-auto animate-fade-in-up" style={{ animationDelay: "0.2s" }}>
             <h2 className="text-2xl font-bold mb-4 text-green-800">Send us a Message</h2>
             <p className="text-gray-600 mb-8">Fill out the form below and we'll get back to you shortly.</p>
 
@@ -63,7 +147,7 @@ export default function ContactUs() {
                   placeholder="Enter your full name"
                   value={form.fullName}
                   onChange={handleChange}
-                  className="border border-gray-300 rounded-lg p-3 w-full text-black"
+                  className="border border-gray-300 rounded-lg p-3 w-full text-black animate-input-focus"
                   required
                 />
                 <input
@@ -72,7 +156,7 @@ export default function ContactUs() {
                   placeholder="Enter your email address"
                   value={form.email}
                   onChange={handleChange}
-                  className="border border-gray-300 rounded-lg p-3 w-full text-black"
+                  className="border border-gray-300 rounded-lg p-3 w-full text-black animate-input-focus"
                   required
                 />
               </div>
@@ -84,13 +168,13 @@ export default function ContactUs() {
                   placeholder="Enter your phone number"
                   value={form.phone}
                   onChange={handleChange}
-                  className="border border-gray-300 rounded-lg p-3 w-full text-black"
+                  className="border border-gray-300 rounded-lg p-3 w-full text-black animate-input-focus"
                 />
                 <select
                   name="subject"
                   value={form.subject}
                   onChange={handleChange}
-                  className="border border-gray-300 rounded-lg p-3 w-full text-black"
+                  className="border border-gray-300 rounded-lg p-3 w-full text-black animate-input-focus"
                   required
                 >
                   <option value="">Select a subject</option>
@@ -105,22 +189,43 @@ export default function ContactUs() {
                 placeholder="Type your message here"
                 value={form.message}
                 onChange={handleChange}
-                className="border border-gray-300 rounded-lg p-3 w-full h-32 text-black"
+                className="border border-gray-300 rounded-lg p-3 w-full h-32 text-black animate-input-focus"
                 required
               />
 
               <button
                 type="submit"
-                className="bg-gradient-to-r from-green-300 to-blue-400 text-white py-3 px-6 rounded-lg hover:opacity-90 flex items-center justify-center gap-2"
+                className="bg-green-600 text-white py-3 px-6 rounded-lg hover:bg-green-500 hover:scale-105 flex items-center justify-center gap-2 shadow-md transition-all duration-300"
               >
                 Send Message ✈️
               </button>
             </form>
           </div>
+
+          {/* Email Us Section */}
+          <div className="bg-gray-100 p-6 rounded-lg shadow-md max-w-md mx-auto animate-fade-in-up" style={{ animationDelay: "0.4s" }}>
+            <h2 className="text-xl font-semibold mb-2 text-green-800">Email Us</h2>
+            <p className="break-words text-gray-600">tutormatch123@gmail.com</p>
+            <p className="mt-2 text-sm text-gray-600">Response within 24 hours</p>
+            <p className="text-sm text-gray-600">Support available in English and Sinhala</p>
+          </div>
+
+          {/* Connect With Us Section */}
+          <div className="bg-gray-100 p-6 rounded-lg shadow-md max-w-md mx-auto animate-fade-in-up" style={{ animationDelay: "0.6s" }}>
+            <h2 className="text-xl font-semibold mb-4 text-green-800">Connect With Us</h2>
+            <div className="flex justify-center space-x-6 text-2xl">
+              <a href="#" aria-label="Facebook" className="text-green-800 hover:text-green-600">🌐</a>
+              <a href="#" aria-label="Twitter" className="text-green-800 hover:text-green-600">🐦</a>
+              <a href="#" aria-label="LinkedIn" className="text-green-800 hover:text-green-600">💼</a>
+              <a href="#" aria-label="Instagram" className="text-green-800 hover:text-green-600">📸</a>
+            </div>
+          </div>
         </div>
       </main>
 
-      <Footer /> {/* <== Add Footer at the bottom */}
+      <div className="relative z-[1] py-6 bg-white animate-fade-in-up" style={{ animationDelay: "0.8s" }}>
+        <Footer />
+      </div>
     </div>
   );
 }
