@@ -226,7 +226,7 @@ export default function TutorDetails() {
             <button onClick={handleBack} className="mr-4">
               <FaArrowLeft className="w-6 h-6" />
             </button>
-            <h1 className="text-2xl font-bold">TutorMatch</h1>
+            <h1 className="text-2xl font-bold">TutorMart</h1>
           </div>
           <nav className="flex space-x-4">
             <a href="/dashboard" className="hover:text-gray-200">Home</a>

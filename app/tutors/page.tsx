@@ -3,6 +3,8 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { FaUserCircle, FaStar } from 'react-icons/fa';
+import Header from '../components/header';
+import Footer from '../components/footer';
 
 // Define the Tutor interface
 interface Tutor {
@@ -190,17 +192,7 @@ export default function Tutors() {
       `}</style>
 
       {/* Header */}
-      <header className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-green-700">TutorMatch</h1>
-          <nav className="flex space-x-4">
-            <a href="/dashboard" className="text-gray-600 hover:text-green-700">Home</a>
-            <a href="#" className="text-gray-600 hover:text-green-700">Things</a>
-            <a href="#" className="text-gray-600 hover:text-green-700">Zip</a>
-            <a href="/signup" className="text-gray-600 hover:text-green-700">Sign Up</a>
-          </nav>
-        </div>
-      </header>
+      <Header/>
 
       {/* Tutors Section */}
       <ScrollReveal>
@@ -237,42 +229,7 @@ export default function Tutors() {
 
       {/* Footer */}
       <ScrollReveal>
-        <footer className="bg-green-700 text-white">
-          <div className="max-w-7xl mx-auto px-4 py-8">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-              <div>
-                <h4 className="text-lg font-semibold mb-4">TutorMatch</h4>
-                <p>Who We Are</p>
-                <p>The Mission</p>
-                <p>Our Blog</p>
-              </div>
-              <div>
-                <h4 className="text-lg font-semibold mb-4">Join the Community</h4>
-                <p>Students</p>
-                <p>Tutors</p>
-                <p>Partners</p>
-              </div>
-              <div>
-                <h4 className="text-lg font-semibold mb-4">Support</h4>
-                <p>Help Center</p>
-                <p>Contact Us</p>
-                <p>FAQs</p>
-              </div>
-              <div>
-                <h4 className="text-lg font-semibold mb-4">Download the App</h4>
-                <div className="flex space-x-4">
-                  <a href="#" className="text-white">
-                    <img src="https://via.placeholder.com/120x40?text=App+Store" alt="App Store" />
-                  </a>
-                  <a href="#" className="text-white">
-                    <img src="https://via.placeholder.com/120x40?text=Google+Play" alt="Google Play" />
-                  </a>
-                </div>
-              </div>
-            </div>
-            <p className="text-center mt-8">© 2025 TutorMatch</p>
-          </div>
-        </footer>
+   <Footer/>
       </ScrollReveal>
     </div>
   );

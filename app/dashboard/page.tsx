@@ -142,8 +142,10 @@ export default function Dashboard() {
   const [currentAdIndex, setCurrentAdIndex] = useState<number>(0);
   const [currentTutorIndex, setCurrentTutorIndex] = useState<number>(0);
   const [isAdHovered, setIsAdHovered] = useState<boolean>(false);
+  const [adDimensions, setAdDimensions] = useState<{ width: number; height: number }[]>([]);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Fetch tutors and ads
   useEffect(() => {
     if (status === 'unauthenticated') {
       router.push('/');
@@ -193,6 +195,8 @@ export default function Dashboard() {
 
         if (data.success) {
           setAds(data.ads);
+          // Initialize dimensions array with placeholders
+          setAdDimensions(data.ads.map(() => ({ width: 0, height: 0 })));
         } else {
           throw new Error('Failed to fetch ads');
         }
@@ -205,6 +209,32 @@ export default function Dashboard() {
     fetchTutors();
     fetchAds();
   }, [status, router]);
+
+  // Load image dimensions dynamically
+  useEffect(() => {
+    const loadImageDimensions = async () => {
+      const dimensionsPromises = ads.map((ad) => {
+        return new Promise<{ width: number; height: number }>((resolve) => {
+          const img = new Image();
+          img.src = ad.imageUrl;
+          img.onload = () => {
+            resolve({ width: img.naturalWidth, height: img.naturalHeight });
+          };
+          img.onerror = () => {
+            // Fallback dimensions if image fails to load
+            resolve({ width: 672, height: 448 }); // Default to 3:2 aspect ratio
+          };
+        });
+      });
+
+      const dimensions = await Promise.all(dimensionsPromises);
+      setAdDimensions(dimensions);
+    };
+
+    if (ads.length > 0) {
+      loadImageDimensions();
+    }
+  }, [ads]);
 
   // Automatic sliding for ads
   const startAutoSlide = useCallback(() => {
@@ -261,7 +291,21 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-0">
+    <div
+      className="min-h-screen bg-gray-0 relative"
+      style={{
+        background: `
+          linear-gradient(135deg, #ffffff, #f0fdf4),
+          repeating-linear-gradient(
+            45deg,
+            rgba(74, 222, 128, 0.1) 0px,
+            rgba(74, 222, 128, 0.1) 10px,
+            transparent 10px,
+            transparent 20px
+          )
+        `,
+      }}
+    >
       <style jsx global>{`
         @keyframes fadeInUp {
           from {
@@ -318,7 +362,7 @@ export default function Dashboard() {
       </ScrollReveal>
 
       <ScrollReveal>
-        <section className="bg-white">
+        <section className="bg-white relative">
           <div className="max-w-[1600px] mx-auto px-4 py-12 text-center">
             <h3 className="text-2xl font-semibold text-gray-800 mb-8">Explore Our Offers</h3>
             {adError && <p className="text-red-500 text-center mb-4">{adError}</p>}
@@ -342,40 +386,55 @@ export default function Dashboard() {
                     className="flex transition-transform duration-500 ease-in-out"
                     style={{ transform: `translateX(-${currentAdIndex * 100}%)` }}
                   >
-                    {ads.map((ad, index) => (
-                      <div 
-                        key={index} 
-                        className="min-w-full flex justify-center"
-                      >
-                        <div
-                          className={`relative block w-full transition-all duration-300 ${
-                            currentAdIndex === index ? 'max-w-7xl' : 'max-w-5xl'
-                          } mx-auto bg-black rounded-lg shadow-lg overflow-hidden`}
+                    {ads.map((ad, index) => {
+                      const dimensions = adDimensions[index] || { width: 672, height: 448 };
+                      // Calculate the aspect ratio
+                      const aspectRatio = dimensions.width / dimensions.height;
+                      // Set a maximum width and calculate height based on aspect ratio
+                      const maxWidth = '600px';
+                      const maxHeight = `calc(${maxWidth} / ${aspectRatio})`;
+
+                      return (
+                        <div 
+                          key={index} 
+                          className="min-w-full flex justify-center items-center"
                         >
-                          <img
-                            src={ad.imageUrl}
-                            alt="Advertisement"
-                            className="w-full h-[448px] object-contain"
-                          />
-                          <button
-                            onClick={prevAd}
-                            className={`absolute left-4 top-1/2 transform -translate-y-1/2 bg-green-600 text-white p-3 rounded-full hover:bg-green-700 transition-all ${
-                              isAdHovered ? 'opacity-100' : 'opacity-0'
-                            }`}
+                          <div
+                            className={`relative block transition-all duration-300 ${
+                              currentAdIndex === index ? 'scale-100' : 'scale-90'
+                            } mx-auto bg-white rounded-lg shadow-lg overflow-hidden min-w-[300px] md:min-w-[400px]`}
+                            style={{
+                              width: '100%',
+                              maxWidth: maxWidth,
+                              height: maxHeight,
+                            }}
                           >
-                            <FaChevronLeft size={24} />
-                          </button>
-                          <button
-                            onClick={nextAd}
-                            className={`absolute right-4 top-1/2 transform -translate-y-1/2 bg-green-600 text-white p-3 rounded-full hover:bg-green-700 transition-all ${
-                              isAdHovered ? 'opacity-100' : 'opacity-0'
-                            }`}
-                          >
-                            <FaChevronRight size={24} />
-                          </button>
+                            <img
+                              src={ad.imageUrl}
+                              alt="Advertisement"
+                              className="w-full h-full object-contain bg-gray-200"
+                              onError={(e) => (e.currentTarget.src = '/placeholder-ad.png')}
+                            />
+                            <button
+                              onClick={prevAd}
+                              className={`absolute left-4 top-1/2 transform -translate-y-1/2 bg-green-600 text-white p-3 rounded-full hover:bg-green-700 transition-all ${
+                                isAdHovered ? 'opacity-100' : 'opacity-0'
+                              }`}
+                            >
+                              <FaChevronLeft size={24} />
+                            </button>
+                            <button
+                              onClick={nextAd}
+                              className={`absolute right-4 top-1/2 transform -translate-y-1/2 bg-green-600 text-white p-3 rounded-full hover:bg-green-700 transition-all ${
+                                isAdHovered ? 'opacity-100' : 'opacity-0'
+                              }`}
+                            >
+                              <FaChevronRight size={24} />
+                            </button>
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
                 <div className="flex justify-center mt-4 space-x-2">
