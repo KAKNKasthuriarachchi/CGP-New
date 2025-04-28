@@ -1,5 +1,5 @@
 "use client";
-import Header from "@/lib/components/Header";
+import Header from "../components/Header";
 import Image from "next/image";
 import { useState } from "react";
 export default function Dashboard() {
