@@ -131,7 +131,7 @@ export default function LandingPage() {
                 />
               </div>
               {/* Small Image */}
-              <div className="absolute -top-12 -left-12 w-64 h-64 rounded-full overflow-hidden animate-float-delay-1">
+              <div className="absolute -top-12 -left-12 w-55 h-55 rounded-full overflow-hidden animate-float-delay-1">
                 <img
                   src="/duo2.jpeg"
                   alt="tutor Icon"
@@ -139,7 +139,7 @@ export default function LandingPage() {
                 />
               </div>
               {/* Medium Image */}
-              <div className="absolute bottom-[-3rem] right-[-3rem] w-72 h-72 rounded-lg overflow-hidden animate-float-delay-2">
+              <div className="absolute bottom-[-3rem] right-[-5rem] w-60 h-60 rounded-lg overflow-hidden animate-float-delay-2">
                 <img
                   src="/duo.jpeg"
                   alt="Chat Bubble"

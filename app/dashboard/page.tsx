@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { FaUserCircle, FaStar, FaChevronLeft, FaChevronRight, FaPhone, FaEnvelope } from 'react-icons/fa';
 import { useSession } from 'next-auth/react';
-import Header from '../components/header';
+import Header from '../components/Header';
 import Footer from '../components/footer';
 
 // Define the Tutor interface
@@ -322,15 +322,18 @@ export default function Dashboard() {
         }
       `}</style>
 
-      <Header />
+      <Header></Header>
 
-      <section className="bg-white relative flex flex-col justify-center items-center py-8">
-        <div className="text-center">
-          <img 
-            src="/logo.png" 
-            alt="Tutor Finder - Make Ideas Happen" 
-            className="max-w-[250px] w-auto m"
-          />
+      <section className="bg-white relative flex flex-col items-center justify-center py-12 max-w-full w-full">
+        <div className="text-center mx-auto mt-16">
+          <div className="flex flex-row items-center justify-center space-x-4">
+            <img 
+              src="/logo.ico" 
+              alt="TutorHub" 
+              className="max-w-[100px] w-auto"
+            />
+            <h1 className="text-3xl font-bold text-green-600">TutorHub</h1>
+          </div>
           <div className="mt-4">
             <h2 className="text-2xl font-bold text-gray-800">
               Welcome, {session?.user?.name ?? 'User'}!

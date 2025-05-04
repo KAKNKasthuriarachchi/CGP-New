@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { FaUserCircle, FaStar } from 'react-icons/fa';
-import Header from '../components/header';
+import Header from '../components/Header';
 import Footer from '../components/footer';
 
 // Define the Tutor interface

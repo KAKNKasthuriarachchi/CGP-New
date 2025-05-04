@@ -261,7 +261,7 @@ export default function TutorDetails() {
                 <div className="flex space-x-4 mb-6">
                   <button
                     onClick={handleEnroll}
-                    className="px-6 py-2 bg-green-500 text-white rounded-full hover:bg-green-600 transition"
+                    className="px-6 py-2 bg-green-500 text-white rounded-full hover:bg-green-600 transition cursor-pointer"
                   >
                     Enroll Now
                   </button>
