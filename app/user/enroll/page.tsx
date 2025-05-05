@@ -186,7 +186,7 @@ export default function EnrollmentPage() {
             {/* ...same as before... */}
 
             <h4 className="text-lg font-semibold text-gray-800 mb-2">Payment</h4>
-            <p className="text-gray-600 mb-4">Enrollment Fee: $10.00</p>
+            <p className="text-gray-600 mb-4">Enrollment Fee: LKR2500.00</p>
 
             {!user ? (
               <p className="mt-2 text-sm">
