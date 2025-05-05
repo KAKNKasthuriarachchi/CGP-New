@@ -194,9 +194,9 @@ export default function Tutors() {
       {/* Header */}
       <Header/>
 
-      {/* Tutors Section */}
+      {/* Tutors Section - Added top padding to prevent header overlap */}
       <ScrollReveal>
-        <section className="bg-white">
+        <section className="bg-white pt-20">
           <div className="max-w-7xl mx-auto px-4 py-12">
             <h2 className="text-3xl font-bold text-gray-800 text-center mb-8">All Tutors</h2>
 

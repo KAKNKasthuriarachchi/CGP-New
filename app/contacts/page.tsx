@@ -1,4 +1,5 @@
-"use client";
+'use client';
+
 import { useState } from "react";
 import Header from "../components/Header";
 import Footer from "../components/footer";
@@ -12,14 +13,39 @@ export default function ContactUs() {
     message: "",
   });
 
+  const [status, setStatus] = useState<string | null>(null); // For success/error messages
+
   const handleChange = (e: { target: { name: any; value: any } }) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: { preventDefault: () => void }) => {
+  const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
-    console.log(form);
-    // You can add your API call here
+    setStatus("Sending...");
+
+    try {
+      const response = await fetch('/api/send-email/route.js', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(form),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to send email');
+      }
+
+      const data = await response.json();
+      if (data.success) {
+        setStatus("Email sent successfully!");
+        setForm({ fullName: "", email: "", phone: "", subject: "", message: "" }); // Reset form
+      } else {
+        throw new Error(data.message || 'Failed to send email');
+      }
+    } catch (error: any) {
+      setStatus(`Error: ${error.message}`);
+    }
   };
 
   return (
@@ -197,13 +223,19 @@ export default function ContactUs() {
                 >
                   Send Message ✈️
                 </button>
+
+                {status && (
+                  <p className={`mt-4 text-center ${status.includes('Error') ? 'text-red-600' : 'text-green-600'}`}>
+                    {status}
+                  </p>
+                )}
               </form>
             </div>
 
             {/* Email Us Section */}
             <div className="bg-gray-100 p-6 rounded-lg shadow-md max-w-md mx-auto animate-contact-fade-in-up" style={{ animationDelay: "0.4s" }}>
               <h2 className="text-xl font-semibold mb-2 text-green-800">Email Us</h2>
-              <p className="break-words text-gray-600">tutormatch123@gmail.com</p>
+              <p className="break-words text-gray-600">tutorhub123@gmail.com</p>
               <p className="mt-2 text-sm text-gray-600">Response within 24 hours</p>
               <p className="text-sm text-gray-600">Support available in English and Sinhala</p>
             </div>

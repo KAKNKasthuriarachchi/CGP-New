@@ -11,7 +11,7 @@ function AddTutorMaterialsPage() {
   const [selectedTutor, setSelectedTutor] = useState('');
   const [subjectPlacePairs, setSubjectPlacePairs] = useState([]);
   const [selectedSubjectPlace, setSelectedSubjectPlace] = useState('');
-  const [materials, setMaterials] = useState([{ type: 'Tute', url: '' }]);
+  const [materials, setMaterials] = useState([{ type: 'Tute', file: null }]); // Changed from url to file
   const [errors, setErrors] = useState({});
 
   // State for ad form
@@ -74,12 +74,12 @@ function AddTutorMaterialsPage() {
   };
 
   const addMaterialField = () => {
-    setMaterials([...materials, { type: 'Tute', url: '' }]);
+    setMaterials([...materials, { type: 'Tute', file: null }]);
   };
 
   const removeMaterialField = (index) => {
     const newMaterials = materials.filter((_, i) => i !== index);
-    setMaterials(newMaterials.length > 0 ? newMaterials : [{ type: 'Tute', url: '' }]);
+    setMaterials(newMaterials.length > 0 ? newMaterials : [{ type: 'Tute', file: null }]);
     if (errors.materials || errors.general) {
       setErrors({
         ...errors,
@@ -99,14 +99,58 @@ function AddTutorMaterialsPage() {
     e.target.classList.remove('border-green-500');
   };
 
-  const handleDrop = (e, index) => {
+  const handleDrop = async (e, index) => {
     e.preventDefault();
     e.target.classList.remove('border-green-500');
-    const data = e.dataTransfer.getData('text/plain');
-    if (data && (data.startsWith('http://') || data.startsWith('https://'))) {
-      handleMaterialChange(index, 'url', data);
+    const file = e.dataTransfer.files[0];
+    if (file) {
+      await handleFileUpload(file, index);
     } else {
-      alert('Please drop a valid URL starting with http:// or https://');
+      alert('Please drop a valid file');
+    }
+  };
+
+  const handleFileInputChange = async (e, index) => {
+    const file = e.target.files[0];
+    if (file) {
+      await handleFileUpload(file, index);
+    }
+  };
+
+  const handleFileUpload = async (file, index) => {
+    if (!file) return;
+
+    const validFileTypes = ['application/pdf', 'video/mp4', 'video/webm', 'video/ogg']; // Add more types as needed
+    if (!validFileTypes.includes(file.type)) {
+      setErrors({ ...errors, materials: 'Please upload a valid file (PDF, MP4, WEBM, OGG)' });
+      return;
+    }
+
+    try {
+      const uploadData = new FormData();
+      uploadData.append('file', file);
+      uploadData.append('upload_preset', process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET);
+      uploadData.append('folder', 'tutor-materials');
+
+      const response = await fetch(
+        `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/upload`,
+        {
+          method: 'POST',
+          body: uploadData,
+        }
+      );
+
+      const data = await response.json();
+      console.log('Cloudinary response:', data);
+      if (!response.ok) {
+        throw new Error(data.error?.message || 'Failed to upload to Cloudinary');
+      }
+
+      handleMaterialChange(index, 'file', data.secure_url); // Store the secure URL
+      setErrors({ ...errors, materials: '' });
+    } catch (err) {
+      console.error('Error uploading material to Cloudinary:', err);
+      setErrors({ ...errors, materials: 'Failed to upload material. Please try again.' });
     }
   };
 
@@ -173,8 +217,8 @@ function AddTutorMaterialsPage() {
     const errors = {};
     if (!selectedTutor) errors.tutor = "Please select a tutor";
     if (!selectedSubjectPlace) errors.subjectPlace = "Please select a subject and place";
-    if (!materials.some(m => m.url.trim())) {
-      errors.materials = "At least one material URL is required";
+    if (!materials.some(m => m.file)) {
+      errors.materials = "At least one material file is required";
     }
 
     if (Object.keys(errors).length > 0) {
@@ -184,9 +228,9 @@ function AddTutorMaterialsPage() {
 
     const [subjectName, subjectPlace] = selectedSubjectPlace.split('|');
 
-    const tutes = materials.filter(m => m.type === 'Tute').map(m => m.url).filter(url => url.trim());
-    const recordings = materials.filter(m => m.type === 'Recording').map(m => m.url).filter(url => url.trim());
-    const pastPapers = materials.filter(m => m.type === 'Past Paper').map(m => m.url).filter(url => url.trim());
+    const tutes = materials.filter(m => m.type === 'Tute').map(m => m.file).filter(url => url);
+    const recordings = materials.filter(m => m.type === 'Recording').map(m => m.file).filter(url => url);
+    const pastPapers = materials.filter(m => m.type === 'Past Paper').map(m => m.file).filter(url => url);
 
     const payload = {
       tutorId: selectedTutor,
@@ -231,7 +275,7 @@ function AddTutorMaterialsPage() {
 
       alert('Tutor materials added successfully!');
 
-      setMaterials([{ type: 'Tute', url: '' }]);
+      setMaterials([{ type: 'Tute', file: null }]);
       setSelectedSubjectPlace('');
       setSelectedTutor('');
       setSubjectPlacePairs([]);
@@ -264,7 +308,7 @@ function AddTutorMaterialsPage() {
     };
 
     try {
-      const adResponse = await fetch('/api/ad', { // Changed from /api/ads to /api/ad
+      const adResponse = await fetch('/api/ad', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -401,23 +445,21 @@ function AddTutorMaterialsPage() {
                 <div className="relative flex-1">
                   <FaVideo className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
                   <input
-                    type="text"
+                    type="file"
                     className={`w-full py-3 pl-10 pr-3 border rounded-lg bg-gray-50 focus:bg-white transition-all focus:outline-none focus:ring-1 ${
                       errors.materials ? 'border-red-500 focus:ring-red-500' : 'border-gray-200 focus:ring-green-500 focus:border-green-500'
                     }`}
-                    placeholder=" "
-                    value={material.url}
-                    onChange={(e) => handleMaterialChange(index, 'url', e.target.value)}
+                    onChange={(e) => handleFileInputChange(e, index)}
                     onDragOver={(e) => handleDragOver(e, index)}
                     onDragLeave={handleDragLeave}
                     onDrop={(e) => handleDrop(e, index)}
                   />
                   <label
                     className={`absolute text-gray-500 left-10 transition-all duration-200 ${
-                      material.url ? 'text-xs -top-2 bg-white px-1 left-3 text-green-700' : 'top-3'
+                      material.file ? 'text-xs -top-2 bg-white px-1 left-3 text-green-700' : 'top-3'
                     }`}
                   >
-                    Material URL (or drag and drop a URL here)
+                    {material.file ? 'File Uploaded' : 'Upload or drag a file here (PDF, MP4, WEBM, OGG)'}
                   </label>
                 </div>
                 <div className="flex items-center gap-2">

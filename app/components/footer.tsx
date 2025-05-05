@@ -73,13 +73,13 @@ export default function Footer() {
             <p className="mb-2 flex items-center">
               <FaEnvelope className="mr-2" />
               <a href="mailto:support@tutormatch.com" className="hover:text-green-200">
-                support@tutormart.com
+                support@tutorhub.com
               </a>
             </p>
             <p className="mb-2 flex items-center">
               <FaPhone className="mr-2" />
-              <a href="tel:+1234567890" className="hover:text-green-200">
-                +1 (234) 567-890
+              <a href="tel:+94712345678" className="hover:text-green-200">
+                +94 71 234 5678
               </a>
             </p>
             <p className="mb-2">
@@ -104,7 +104,7 @@ export default function Footer() {
             </div>
           </div>
         </div>
-        <p className="text-center mt-8">© 2025 TutorMatch</p>
+        <p className="text-center mt-8">© 2025 TutorHub</p>
       </div>
     </footer>
   );

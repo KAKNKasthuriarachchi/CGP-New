@@ -346,28 +346,37 @@ export default function Dashboard() {
       </section>
 
       <ScrollReveal>
-        <section className="bg-gray-100">
-          <div className="max-w-7xl mx-auto px-4 py-12 text-center">
-            <h3 className="text-3xl font-bold text-gray-800 mb-4">Discover TutorMatch</h3>
-            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-              TutorMatch connects students with top-tier educators for personalized learning experiences. 
-              Whether you're mastering a new subject or advancing your skills, our platform makes finding 
-              the perfect tutor easy and seamless. Join our community and start your learning journey today!
-            </p>
-            <button
-              onClick={() => router.push('/about')}
-              className="mt-6 px-6 py-2 bg-green-600 text-white rounded-full hover:bg-green-700 transition"
-            >
-              About Us
-            </button>
-          </div>
-        </section>
+        <section className="bg-gray-50 border-2 border-green-500 rounded-xl shadow-lg mx-4 my-8">
+  <div className="max-w-7xl mx-auto px-4 py-12 text-center">
+    <h3 className="text-3xl font-bold text-gray-800 mb-4">Discover TutorHub</h3>
+    <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+      TutorHub connects students with top-tier educators for personalized learning experiences. 
+      Whether you're mastering a new subject or advancing your skills, our platform makes finding 
+      the perfect tutor easy and seamless. Join our community and start your learning journey today!
+    </p>
+    <div className="mt-6 flex justify-center">
+      <img 
+        src="/duo.jpeg" 
+        alt="Discover TutorMatch" 
+        className="w-full max-w-xl mx-auto rounded-lg shadow-md"
+      />
+    </div>
+    <button
+      onClick={() => router.push('/about')}
+      className="mt-6 px-6 py-2 bg-green-600 text-white rounded-full hover:bg-green-700 transition"
+    >
+      About Us
+    </button>
+  </div>
+</section>
       </ScrollReveal>
 
       <ScrollReveal>
         <section className="bg-white relative">
           <div className="max-w-[1600px] mx-auto px-4 py-12 text-center">
-            <h3 className="text-2xl font-semibold text-gray-800 mb-8">Explore Our Offers</h3>
+          <h3 className="text-2xl font-semibold text-gray-800 mb-8 px-6 py-2 bg-white border-2 border-green-500 rounded-lg shadow-md">
+        Explore Our Offers
+      </h3>
             {adError && <p className="text-red-500 text-center mb-4">{adError}</p>}
             {ads.length === 0 && !adError && (
               <p className="text-gray-600 text-center mb-4">No advertisements available.</p>
@@ -462,75 +471,77 @@ export default function Dashboard() {
       </ScrollReveal>
 
       <ScrollReveal>
-        <section className="bg-gray-100">
-          <div className="max-w-3xl mx-auto px-4 py-16">
-            <h3 className="text-2xl font-semibold text-gray-800 text-center mb-8">Choose Your Tutor</h3>
-            {error && <p className="text-red-500 text-center mb-4">{error}</p>}
-            {loading && <p className="text-gray-600 text-center mb-4">Loading tutors...</p>}
-            {!loading && tutors.length === 0 && !error && (
-              <p className="text-gray-600 text-center mb-4">No tutors found.</p>
-            )}
-            {tutors.length > 0 && (
-              <div className="relative">
-                <div className="flex items-center justify-center">
-                  <button
-                    onClick={prevTutor}
-                    className="flex-none -ml-12 bg-green-600 text-white p-3 rounded-full hover:bg-green-700 transition-all"
-                    disabled={currentTutorIndex === 0}
-                  >
-                    <FaChevronLeft size={20} />
-                  </button>
-                  <div className="flex-1 overflow-x-hidden">
-                    <div className="flex items-center justify-center">
-                      <div
-                        className="flex flex-nowrap transition-transform duration-500 ease-in-out"
-                        style={{
-                          transform: `translateX(calc(50% - ${currentTutorIndex * 320}px - 160px))`,
-                        }}
-                      >
-                        {tutors.map((tutor, index) => {
-                          const distance = Math.abs(index - currentTutorIndex);
-                          const scale = distance === 0 ? 1.2 : distance === 1 ? 1 : 0.8;
-                          return (
-                            <div key={tutor.id} className="flex-shrink-0 w-80 h-96 flex justify-center items-center">
-                              <TutorCard tutor={tutor} scale={scale} />
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  </div>
-                  <button
-                    onClick={nextTutor}
-                    className="flex-none -mr-12 bg-green-600 text-white p-3 rounded-full hover:bg-green-700 transition-all"
-                    disabled={currentTutorIndex === tutors.length - 1}
-                  >
-                    <FaChevronRight size={20} />
-                  </button>
-                </div>
-                <div className="flex justify-center mt-4 space-x-2">
-                  {tutors.map((_, index) => (
-                    <button
-                      key={index}
-                      onClick={() => setCurrentTutorIndex(index)}
-                      className={`w-3 h-3 rounded-full ${
-                        currentTutorIndex === index ? 'bg-green-600' : 'bg-gray-300'
-                      }`}
-                    />
-                  ))}
-                </div>
-              </div>
-            )}
-            <div className="text-center mt-6">
-              <button
-                onClick={handleViewAllTutors}
-                className="px-6 py-2 bg-green-600 text-white rounded-full hover:bg-green-700 transition"
+      <section className="bg-white border-2 border-green-500 rounded-xl">
+  <div className="max-w-3xl mx-auto px-4 py-16">
+    <h3 className="text-2xl font-semibold text-green-500 text-center mb-8 px-6 py-2 ">
+      Choose Your Tutor
+    </h3>
+    {error && <p className="text-red-500 text-center mb-4">{error}</p>}
+    {loading && <p className="text-gray-600 text-center mb-4">Loading tutors...</p>}
+    {!loading && tutors.length === 0 && !error && (
+      <p className="text-gray-600 text-center mb-4">No tutors found.</p>
+    )}
+    {tutors.length > 0 && (
+      <div className="relative">
+        <div className="flex items-center justify-center">
+          <button
+            onClick={prevTutor}
+            className="flex-none -ml-12 bg-green-600 text-white p-3 rounded-full hover:bg-green-700 transition-all"
+            disabled={currentTutorIndex === 0}
+          >
+            <FaChevronLeft size={20} />
+          </button>
+          <div className="flex-1 overflow-x-hidden">
+            <div className="flex items-center justify-center">
+              <div
+                className="flex flex-nowrap transition-transform duration-500 ease-in-out"
+                style={{
+                  transform: `translateX(calc(50% - ${currentTutorIndex * 320}px - 160px))`,
+                }}
               >
-                View All Tutors
-              </button>
+                {tutors.map((tutor, index) => {
+                  const distance = Math.abs(index - currentTutorIndex);
+                  const scale = distance === 0 ? 1.2 : distance === 1 ? 1 : 0.8;
+                  return (
+                    <div key={tutor.id} className="flex-shrink-0 w-80 h-96 flex justify-center items-center">
+                      <TutorCard tutor={tutor} scale={scale} />
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
-        </section>
+          <button
+            onClick={nextTutor}
+            className="flex-none -mr-12 bg-green-600 text-white p-3 rounded-full hover:bg-green-700 transition-all"
+            disabled={currentTutorIndex === tutors.length - 1}
+          >
+            <FaChevronRight size={20} />
+          </button>
+        </div>
+        <div className="flex justify-center mt-4 space-x-2">
+          {tutors.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => setCurrentTutorIndex(index)}
+              className={`w-3 h-3 rounded-full ${
+                currentTutorIndex === index ? 'bg-green-600' : 'bg-gray-300'
+              }`}
+            />
+          ))}
+        </div>
+      </div>
+    )}
+    <div className="text-center mt-6">
+      <button
+        onClick={handleViewAllTutors}
+        className="px-6 py-2 bg-green-600 text-white rounded-full hover:bg-green-700 transition"
+      >
+        View All Tutors
+      </button>
+    </div>
+  </div>
+</section>
       </ScrollReveal>
 
       <ScrollReveal>
@@ -573,13 +584,13 @@ export default function Dashboard() {
               <div className="flex items-center">
                 <FaEnvelope className="text-green-600 w-6 h-6 mr-2" />
                 <a href="mailto:support@tutormatch.com" className="text-gray-800 hover:text-green-700">
-                  support@tutormatch.com
+                  support@tutorhub.com
                 </a>
               </div>
               <div className="flex items-center">
                 <FaPhone className="text-green-600 w-6 h-6 mr-2" />
                 <a href="tel:+1234567890" className="text-gray-800 hover:text-green-700">
-                  +1 (234) 567-890
+                  +94712345678
                 </a>
               </div>
             </div>

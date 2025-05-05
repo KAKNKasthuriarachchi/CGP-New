@@ -354,7 +354,7 @@ function AddTutorPage() {
                   formData.section ? "text-xs -top-2 bg-white px-1 left-3 text-green-700" : "top-3"
                 }`}
               >
-                Section (e.g., Primary, Advanced Level)
+                Section 
               </label>
             </div>
             {errors.section && <p className="mt-1 text-xs text-red-500">{errors.section}</p>}
@@ -381,7 +381,7 @@ function AddTutorPage() {
                   formData.stream ? "text-xs -top-2 bg-white px-1 left-3 text-green-700" : "top-3"
                 }`}
               >
-                Stream (e.g., AL Maths Stream)
+                Stream 
               </label>
             </div>
             {errors.stream && <p className="mt-1 text-xs text-red-500">{errors.stream}</p>}
@@ -409,7 +409,7 @@ function AddTutorPage() {
                       sub.name ? "text-xs -top-2 bg-white px-1 left-3 text-green-700" : "top-3"
                     }`}
                   >
-                    Subject {index + 1} (e.g., Mathematics)
+                    Subject {index + 1} 
                   </label>
                 </div>
                 <div className="relative flex-1">
@@ -430,7 +430,7 @@ function AddTutorPage() {
                       sub.place ? "text-xs -top-2 bg-white px-1 left-3 text-green-700" : "top-3"
                     }`}
                   >
-                    Place for Subject {index + 1} (e.g., Colombo)
+                    Place for Subject {index + 1} 
                   </label>
                 </div>
                 <div className="flex items-center gap-2">

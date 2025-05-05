@@ -19,7 +19,7 @@ export default function Header() {
       <div className="container mx-auto flex justify-between items-center">
         <h1 className="text-2xl font-bold cursor-pointer flex items-center" onClick={() => router.push('/')}>
           <img src="/logo1.ico" alt="TutorMart Logo" className="w-8 h-8 mr-2" />
-          TutorMart
+          TutorHub
         </h1>
         
         <nav className="flex space-x-6">
