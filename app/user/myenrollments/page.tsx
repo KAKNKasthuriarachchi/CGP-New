@@ -6,7 +6,6 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Book, X } from "lucide-react";
 import Header from "../../components/Header";
-import footer from "../../components/footer";
 import Footer from "../../components/footer";
 
 export default function MyEnrollments() {
@@ -162,8 +161,8 @@ export default function MyEnrollments() {
 
         {/* Materials Popup */}
         {showMaterialsPopup && selectedEnrollment && materials && (
-          <div className="fixed inset-0 bg-gray-500 bg-opacity-30 flex items-center justify-center z-50">
-            <div className="bg-transparent border border-gray-300 backdrop-blur-sm rounded-lg shadow-lg p-8 max-w-lg w-full mx-4 relative">
+          <div className="fixed inset-0 bg-white bg-opacity-2000 flex items-center justify-center z-50">
+            <div className="bg-transparent border border-gray-0 rounded-lg shadow-lg p-8 max-w-lg w-full mx-4 relative">
               {/* Close Button */}
               <button
                 onClick={closePopup}

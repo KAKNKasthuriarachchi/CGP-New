@@ -58,10 +58,10 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
+  
     let valid = true;
     const newErrors: Errors = { email: false, password: false };
-
+  
     if (!formData.email.trim()) {
       newErrors.email = true;
       valid = false;
@@ -69,30 +69,29 @@ export default function LoginPage() {
       newErrors.email = true;
       valid = false;
     }
-
+  
     if (!formData.password.trim()) {
       newErrors.password = true;
       valid = false;
     }
-
+  
     setErrors(newErrors);
-
+  
     if (valid) {
-      try {
-        const result = await signIn('credentials', {
-          email: formData.email,
-          password: formData.password,
-          redirect: true, 
-        });
-
-        if (result?.error) {
-          throw new Error(result.error || 'Failed to log in');
-        }
-      } catch (err: any) {
-        setErrors({ ...errors, form: err.message || 'An error occurred while logging in' });
+      const result = await signIn('credentials', {
+        email: formData.email,
+        password: formData.password,
+        redirect: false,
+      });
+  
+      if (result?.error) {
+        setErrors({ ...newErrors, form: result.error });
+      } else {
+        window.location.href = '/dashboard'; // or use router.push()
       }
     }
   };
+  
 
   return (
     <div className="min-h-screen flex items-center justify-center p-5 relative">

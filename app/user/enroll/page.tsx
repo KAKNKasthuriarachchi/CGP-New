@@ -1,11 +1,27 @@
 // @ts-nocheck
-
-"use client"
+"use client";
 
 import React, { useState, useEffect } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
+import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 
-const enrollmentFee = 1500; // Enrollment Fee in LKR
+interface Tutor {
+  id: string;
+  firstName: string;
+  lastName: string;
+  description: string;
+  rating: number;
+  contactNumber: string;
+  email: string;
+  picture?: string;
+  subject: { name: string; place: string }[];
+}
+
+interface User {
+  id: string;
+  name: string;
+  email: string;
+}
 
 export default function EnrollmentPage() {
   const searchParams = useSearchParams();
@@ -20,10 +36,21 @@ export default function EnrollmentPage() {
   const contactNumber = searchParams.get("contactNumber");
   const email = searchParams.get("email");
 
-  const [tutor, setTutor] = useState(null);
-  const [user, setUser] = useState(null);
-  const [success, setSuccess] = useState(null);
-  const [userFetchError, setUserFetchError] = useState(null);
+  const [tutor, setTutor] = useState<Tutor | null>(null);
+  const [tutorFetchError, setTutorFetchError] = useState<string | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [userFetchError, setUserFetchError] = useState<string | null>(null);
+  const [formData, setFormData] = useState({
+    fullName: "",
+    phoneNumber: "",
+    email: "",
+    address: "",
+    subjectName: "Mathematics",
+    location: "Online",
+  });
+  const [success, setSuccess] = useState<string | null>(null);
+
+  const enrollmentFee = 10;
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -35,6 +62,7 @@ export default function EnrollmentPage() {
 
         if (data.success) {
           setUser(data.user);
+          setFormData((prev) => ({ ...prev, email: data.user.email || "" }));
         } else {
           throw new Error("Failed to fetch user");
         }
@@ -49,7 +77,7 @@ export default function EnrollmentPage() {
   useEffect(() => {
     const fetchTutor = async () => {
       if (!tutorId) {
-        console.error("Tutor ID is missing");
+        setTutorFetchError("Tutor ID is missing");
         return;
       }
 
@@ -60,84 +88,69 @@ export default function EnrollmentPage() {
         if (!response.ok) throw new Error(data.error || "Failed to fetch tutor");
 
         if (data.success) {
-          const transformedTutor = {
+          const transformedTutor: Tutor = {
             ...data.tutor,
             description: description ? decodeURIComponent(description) : data.tutor.description,
             rating: rating ? parseFloat(rating) : Math.random() * (5 - 4) + 4,
             contactNumber: contactNumber ? decodeURIComponent(contactNumber) : data.tutor.contactNumber,
             email: email ? decodeURIComponent(email) : data.tutor.email,
+            picture: data.tutor.picture || "https://img.icons8.com/?size=100&id=WNS8XGkd1Rhp&format=png&color=000000",
+            subject: data.tutor.subject || [],
           };
           setTutor(transformedTutor);
+
+          if (transformedTutor.subject.length > 0) {
+            setFormData((prev) => ({
+              ...prev,
+              subjectName: transformedTutor.subject[0].name || prev.subjectName,
+              location: transformedTutor.subject[0].place || prev.location,
+            }));
+          }
         } else {
           throw new Error("Failed to fetch tutor");
         }
       } catch (err) {
-        console.error(err.message || "An error occurred while fetching tutor");
+        setTutorFetchError(err.message || "An error occurred while fetching tutor");
       }
     };
 
     fetchTutor();
   }, [tutorId, description, rating, contactNumber, email]);
 
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleBack = () => {
+    router.back();
+  };
+
   const handlePaymentSuccess = () => {
     setSuccess("Payment successful! Redirecting to dashboard...");
     setTimeout(() => router.push("/dashboard"), 2000);
   };
 
-  const handlePayment = () => {
-    if (!user) {
-      alert("You must be logged in to make a payment.");
-      return;
-    }
-
-    // PayHere payment details
-    const paymentDetails = {
-      merchant_id: "YOUR_PAYHERE_MERCHANT_ID", // Replace with your PayHere merchant ID
-      return_url: `${currentUrl}/payment-success`, // Success URL
-      cancel_url: `${currentUrl}/payment-cancel`, // Cancel URL
-      notify_url: `${currentUrl}/payment-notify`, // Payment notification URL
-      order_id: `${Date.now()}`, // Unique order ID (use timestamp for uniqueness)
-      amount: enrollmentFee, // Enrollment fee in LKR
-      currency: "LKR", // Currency in LKR
-      first_name: user.name, // User's first name
-      email: user.email, // User's email
-      phone: user.phoneNumber, // User's phone number (if available)
-      address: user.address, // User's address
-    };
-
-    // Load PayHere SDK
-    const payhere = window.PayHere;
-
-    payhere.on('payment-complete', (payment) => {
-      console.log('Payment complete', payment);
-      handlePaymentSuccess();
-    });
-
-    payhere.on('payment-failed', (error) => {
-      console.error('Payment failed', error);
-      alert("Payment failed. Please try again.");
-    });
-
-    // Trigger PayHere payment
-    payhere.startPayment(paymentDetails);
-  };
-
   return (
     <div className="min-h-screen bg-gray-100 py-8">
       <div className="max-w-4xl mx-auto px-4">
-        <button onClick={() => router.back()} className="mb-4 text-green-600 hover:underline flex items-center">
+        <button
+          onClick={handleBack}
+          className="mb-4 text-green-600 hover:underline flex items-center"
+        >
           <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
           </svg>
           Back
         </button>
 
+        {tutorFetchError && <p className="text-red-500 text-center mb-4">{tutorFetchError}</p>}
         {userFetchError && <p className="text-red-500 text-center mb-4">{userFetchError}</p>}
 
         {tutor && (
           <div className="bg-white p-6 rounded-lg shadow-md mb-6 flex items-start space-x-4">
             <img
-              src={tutor.picture || "https://img.icons8.com/?size=100&id=WNS8XGkd1Rhp&format=png&color=000000"}
+              src={tutor.picture}
               alt={`${tutor.firstName} ${tutor.lastName}`}
               className="w-16 h-16 rounded-full object-cover"
             />
@@ -169,8 +182,11 @@ export default function EnrollmentPage() {
           <h3 className="text-xl font-semibold text-gray-800 mb-4">Enrollment Form</h3>
           {success && <p className="text-green-500 mb-4">{success}</p>}
           <form className="space-y-4">
+            {/* form fields */}
+            {/* ...same as before... */}
+
             <h4 className="text-lg font-semibold text-gray-800 mb-2">Payment</h4>
-            <p className="text-gray-600 mb-4">Enrollment Fee: LKR {enrollmentFee}</p>
+            <p className="text-gray-600 mb-4">Enrollment Fee: $10.00</p>
 
             {!user ? (
               <p className="mt-2 text-sm">
@@ -179,13 +195,35 @@ export default function EnrollmentPage() {
                 </a>
               </p>
             ) : (
-              <button
-                type="button"
-                onClick={handlePayment}
-                className="w-full py-2 px-4 bg-green-600 text-white rounded-full hover:bg-green-700"
+              <PayPalScriptProvider
+                options={{
+                  "client-id": process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID!,
+                  currency: "USD",
+                  components: "buttons",
+                }}
               >
-                Pay LKR {enrollmentFee}
-              </button>
+                <PayPalButtons
+                  style={{ layout: "vertical", color: "gold", shape: "pill" }}
+                  createOrder={(data, actions) => {
+                    return actions.order.create({
+                      purchase_units: [
+                        {
+                          amount: { value: enrollmentFee.toString() },
+                        },
+                      ],
+                    });
+                  }}
+                  onApprove={async (data, actions) => {
+                    const details = await actions.order.capture();
+                    console.log("Payment approved:", details);
+                    handlePaymentSuccess();
+                  }}
+                  onError={(err) => {
+                    console.error("PayPal Checkout Error:", err);
+                    alert("Payment failed. Please try again.");
+                  }}
+                />
+              </PayPalScriptProvider>
             )}
           </form>
         </div>
