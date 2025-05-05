@@ -198,12 +198,12 @@ export default function LoginPage() {
           
           <div className="relative z-10">
             <h1 className="font-serif text-3xl font-bold mb-2">Welcome Back!</h1>
-            <p className="text-base mb-8">Continue your learning journey with TutorMart</p>
+            <p className="text-base mb-8">Continue your learning journey with TutorHub</p>
             
             <div className="mt-6 p-5 bg-white/10 rounded-lg relative">
               <div className="absolute top-0 left-3 text-5xl leading-none text-white/30 transform -translate-y-1/2">"</div>
               <p className="italic mb-4">
-                "TutorMart helped me find the perfect math tutor. My grades improved dramatically in just two months!"
+                "TutorHub helped me find the perfect math tutor. My grades improved dramatically in just two months!"
               </p>
               <div className="flex items-center">
                 <div className="w-10 h-10 rounded-full bg-green-500/50 flex items-center justify-center mr-3">
@@ -222,7 +222,7 @@ export default function LoginPage() {
         <div className="md:w-3/5 bg-white p-10 md:p-12 flex flex-col justify-center">
           <div className="font-serif text-2xl font-bold text-green-700 mb-8 flex items-center">
             <img src="/logo.ico" alt="App Logo" className="w-7 h-7 mr-2" />
-            TutorMart
+            TutorHub
           </div>
           
           <h2 className="text-2xl font-semibold mb-2 text-gray-800">Log In to Your Account</h2>
@@ -239,7 +239,7 @@ export default function LoginPage() {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className={`w-full py-3 pl-10 pr-4 border ${errors.email ? 'border-red-500' : 'border-gray-200'} rounded-3xl bg-white focus:outline-none focus:border-green-500 focus:bg-white transition-all shadow-sm hover:shadow-md hover:border-green-600`}
+                  className={`w-full py-3 pl-10 pr-4 border ${errors.email ? 'border-red-500' : 'border-gray-200'} rounded-3xl bg-white text-black placeholder-gray-400 focus:outline-none focus:border-green-500 focus:bg-white transition-all shadow-sm hover:shadow-md hover:border-green-600`}
                   placeholder=" "
                   required
                 />
@@ -258,7 +258,7 @@ export default function LoginPage() {
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
-                  className={`w-full py-3 pl-10 pr-10 border ${errors.password ? 'border-red-500' : 'border-gray-200'} rounded-3xl bg-white focus:outline-none focus:border-green-500 focus:bg-white transition-all shadow-sm hover:shadow-md hover:border-green-600`}
+                  className={`w-full py-3 pl-10 pr-10 border ${errors.password ? 'border-red-500' : 'border-gray-200'} rounded-3xl bg-white text-black placeholder-gray-400 focus:outline-none focus:border-green-500 focus:bg-white transition-all shadow-sm hover:shadow-md hover:border-green-600`}
                   placeholder=" "
                   required
                 />

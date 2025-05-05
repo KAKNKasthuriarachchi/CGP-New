@@ -45,7 +45,7 @@ export default function AboutUsPage() {
           <div className="md:w-1/2 text-center md:text-left">
             <h1 className="text-4xl md:text-5xl font-bold mb-4">About TutorHub</h1>
             <p className="text-lg md:text-xl mb-6">
-            Tutor Hub is a comprehensive platform designed to help students easily find and connect with the best tutors for their academic and personal learning needs. We recognize that every learner is different, so Tutor Hub offers a flexible and user-friendly experience to match students with tutors based on subject, location, availability, and teaching preferences.
+            TutorHub is a comprehensive platform designed to help students easily find and connect with the best tutors for their academic and personal learning needs. We recognize that every learner is different, so Tutor Hub offers a flexible and user-friendly experience to match students with tutors based on subject, location, availability, and teaching preferences.
 
 From detailed tutor profiles and verified ratings to personalized course offerings and secure online payments, Tutor Hub makes the entire enrollment process smooth and transparent. Students can browse tutor information, review their qualifications, check their schedules, and even access study materials—all in one place.
 

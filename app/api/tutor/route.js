@@ -31,7 +31,7 @@ export async function GET(request) {
     }
 
     // If stream and section are provided, fetch related tutors (excluding the tutor with the given ID)
-    if (stream && section) {
+    if (section && stream) {
       if (!excludeId) {
         return NextResponse.json(
           { success: false, error: "excludeId is required when fetching related tutors" },

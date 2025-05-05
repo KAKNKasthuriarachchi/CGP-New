@@ -3,6 +3,8 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { FaArrowLeft, FaUserCircle, FaStar } from 'react-icons/fa';
+import Header from '../../components/Header';
+import Footer from '../../components/footer';
 
 interface Tutor {
   _id: string;
@@ -19,7 +21,7 @@ interface Tutor {
   rating: number;
 }
 
-// Custom hook for Intersection Observer
+
 const useIntersectionObserver = (options: IntersectionObserverInit) => {
   const [isVisible, setIsVisible] = useState(false);
   const ref = useRef<HTMLDivElement | null>(null);
@@ -56,7 +58,7 @@ const useIntersectionObserver = (options: IntersectionObserverInit) => {
   return { ref, isVisible };
 };
 
-// ScrollReveal Component to wrap sections
+
 const ScrollReveal: React.FC<{ children: React.ReactNode; stagger?: boolean; index?: number }> = ({ children, stagger = false, index = 0 }) => {
   const { ref, isVisible } = useIntersectionObserver({
     threshold: 0.05,
@@ -76,7 +78,7 @@ const ScrollReveal: React.FC<{ children: React.ReactNode; stagger?: boolean; ind
   );
 };
 
-// Tutor Card Component for related tutors
+
 const TutorCard: React.FC<{ tutor: Tutor; index: number }> = ({ tutor, index }) => {
   const router = useRouter();
 
@@ -219,34 +221,17 @@ export default function TutorDetails() {
         }
       `}</style>
 
-      {/* Header */}
-      <header className="bg-green-700 text-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="flex items-center">
-            <button onClick={handleBack} className="mr-4">
-              <FaArrowLeft className="w-6 h-6" />
-            </button>
-            <h1 className="text-2xl font-bold">TutorMart</h1>
-          </div>
-          <nav className="flex space-x-4">
-            <a href="/dashboard" className="hover:text-gray-200">Home</a>
-            <a href="#" className="hover:text-gray-200">About</a>
-            <a href="#" className="hover:text-gray-200">Contact Us</a>
-            <div className="flex items-center space-x-2">
-              <FaUserCircle className="w-6 h-6" />
-              <span>Hi, User</span>
-              <a href="#" className="hover:text-gray-200">Log Out</a>
-            </div>
-          </nav>
-        </div>
-      </header>
+    
+      <Header />
 
-      {/* Tutor Details Section */}
+    
+
+      
       <ScrollReveal>
-        <section className="bg-white">
+        <section className="bg-white pt-20">
           <div className="max-w-7xl mx-auto px-4 py-12">
             <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
-              {/* Tutor Image */}
+              
               <div className="w-48 h-48 bg-gray-200 rounded-lg flex items-center justify-center">
                 {tutor.picture ? (
                   <img src={tutor.picture} alt={`${tutor.firstName} ${tutor.lastName}`} className="w-full h-full object-cover rounded-lg" />
@@ -255,7 +240,6 @@ export default function TutorDetails() {
                 )}
               </div>
 
-              {/* Tutor Info */}
               <div className="flex-1">
                 <h2 className="text-3xl font-bold text-gray-800 mb-4">{`${tutor.firstName} ${tutor.lastName}`}</h2>
                 <div className="flex space-x-4 mb-6">
@@ -267,13 +251,13 @@ export default function TutorDetails() {
                   </button>
                 </div>
 
-                {/* Brief Intro */}
+               
                 <div className="mb-6">
                   <h3 className="text-xl font-semibold text-gray-800 mb-2">About</h3>
                   <p className="text-gray-600">{tutor.description}</p>
                 </div>
 
-                {/* Subjects and Locations */}
+                
                 <div className="mb-6">
                   <h3 className="text-xl font-semibold text-gray-800 mb-2">Subjects & Locations</h3>
                   {tutor.subject && tutor.subject.length > 0 ? (
@@ -287,13 +271,13 @@ export default function TutorDetails() {
                   )}
                 </div>
 
-                {/* Qualifications */}
+            
                 <div className="mb-6">
                   <h3 className="text-xl font-semibold text-gray-800 mb-2">Qualifications</h3>
                   <p className="text-gray-600">{tutor.qualifications}</p>
                 </div>
 
-                {/* Contact Details */}
+               
                 <div>
                   <h3 className="text-xl font-semibold text-gray-800 mb-2">Contact Details</h3>
                   <p className="text-gray-600"><strong>Email:</strong> {tutor.email || 'Not provided'}</p>
@@ -305,7 +289,7 @@ export default function TutorDetails() {
         </section>
       </ScrollReveal>
 
-      {/* Related Tutors Section */}
+      
       <ScrollReveal>
         <section className="bg-gray-100">
           <div className="max-w-7xl mx-auto px-4 py-12">
@@ -325,44 +309,8 @@ export default function TutorDetails() {
         </section>
       </ScrollReveal>
 
-      {/* Footer */}
       <ScrollReveal>
-        <footer className="bg-green-700 text-white">
-          <div className="max-w-7xl mx-auto px-4 py-8">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-              <div>
-                <h3 className="text-lg font-semibold mb-4">TutorMatch</h3>
-                <p>Who We Are</p>
-                <p>The Mission</p>
-                <p>Our Blog</p>
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold mb-4">Join the Community</h3>
-                <p>Students</p>
-                <p>Tutors</p>
-                <p>Partners</p>
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold mb-4">Support</h3>
-                <p>Help Center</p>
-                <p>Contact Us</p>
-                <p>FAQs</p>
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold mb-4">Download the App</h3>
-                <div className="flex space-x-4">
-                  <a href="#" className="text-white">
-                    <img src="https://via.placeholder.com/120x40?text=App+Store" alt="App Store" />
-                  </a>
-                  <a href="#" className="text-white">
-                    <img src="https://via.placeholder.com/120x40?text=Google+Play" alt="Google Play" />
-                  </a>
-                </div>
-              </div>
-            </div>
-            <p className="text-center mt-8">© 2025 TutorMatch</p>
-          </div>
-        </footer>
+        <Footer />
       </ScrollReveal>
     </div>
   );

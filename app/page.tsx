@@ -6,16 +6,16 @@ import { FaLeaf } from 'react-icons/fa';
 export default function LandingPage() {
   return (
     <div className="relative min-h-screen flex flex-col">
-      {/* Background Image */}
+     
       <div
         className="absolute inset-0 bg-cover bg-center opacity-55"
         style={{ backgroundImage: "url('/bg.jpeg')" }}
       />
 
-      {/* Content on top of background */}
+      
       <div className="relative flex flex-col min-h-screen">
 
-        {/* Global styles for floating animation */}
+        
         <style jsx global>{`
           @keyframes float {
             0%, 100% {
@@ -63,10 +63,10 @@ export default function LandingPage() {
           }
         `}</style>
 
-        {/* Header - Adjusted for logo to fit properly */}
+       
         <header className="bg-white shadow-sm h-16">
           <div className="max-w-7xl mx-auto px-4 flex justify-between items-center h-full">
-            {/* Logo and Brand - Adjusted spacing and sizing */}
+           
             <div className="flex items-center">
               <div className="h-12 w-12 flex items-center justify-center mr-2">
                 <img
@@ -75,10 +75,10 @@ export default function LandingPage() {
                   className="max-h-full max-w-full object-contain"
                 />
               </div>
-              <h1 className="text-xl font-bold text-green-800">TutorMatch</h1>
+              <h1 className="text-xl font-bold text-green-800">TutorHub</h1>
             </div>
 
-            {/* Navigation Links - Made bold and adjusted sizing */}
+           
             <nav className="flex items-center space-x-6">
               <Link 
                 href="/auth/login" 
@@ -96,10 +96,10 @@ export default function LandingPage() {
           </div>
         </header>
 
-        {/* Main Section */}
+       
         <main className="flex-1 flex items-center justify-center px-4 py-16">
           <div className="max-w-7xl w-full flex flex-col md:flex-row items-center justify-between">
-            {/* Left Side: Text and Button */}
+            
             <div className="md:w-1/2 text-center md:text-left md:pr-16">
               <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
                 Find Your Perfect Tutor with Ease
@@ -120,9 +120,9 @@ export default function LandingPage() {
               </Link>
             </div>
 
-            {/* Right Side: Decorative Images with Floating Effect */}
+        
             <div className="md:w-1/2 mt-16 md:mt-0 flex justify-center relative p-12">
-              {/* Main Image */}
+             
               <div className="w-96 h-96 rounded-lg overflow-hidden animate-float">
                 <img
                   src="/student.jpeg"
@@ -130,7 +130,7 @@ export default function LandingPage() {
                   className="w-full h-full object-cover"
                 />
               </div>
-              {/* Small Image */}
+             
               <div className="absolute -top-12 -left-12 w-55 h-55 rounded-full overflow-hidden animate-float-delay-1">
                 <img
                   src="/duo2.jpeg"
@@ -138,7 +138,7 @@ export default function LandingPage() {
                   className="w-full h-full object-cover"
                 />
               </div>
-              {/* Medium Image */}
+            
               <div className="absolute bottom-[-3rem] right-[-5rem] w-60 h-60 rounded-lg overflow-hidden animate-float-delay-2">
                 <img
                   src="/duo.jpeg"
@@ -150,7 +150,7 @@ export default function LandingPage() {
           </div>
         </main>
 
-        {/* Updated Footer with Logo Image */}
+     
         <footer className="bg-white py-6">
           <div className="max-w-7xl mx-auto px-4 flex justify-between items-center">
             <div className="flex items-center">
@@ -161,13 +161,13 @@ export default function LandingPage() {
                   className="max-h-full max-w-full object-contain"
                 />
               </div>
-              <span className="text-green-800 font-semibold">TutorMart</span>
+              <span className="text-green-800 font-semibold">TutorHub</span>
             </div>
-            <p className="text-green-700">© 2025 TutorMart</p>
+            <p className="text-green-700">© 2025 TutorHub</p>
           </div>
         </footer>
 
-      </div> {/* Closing relative content div */}
-    </div>   /* Closing main wrapper div */
+      </div> 
+    </div>   
   );
 }

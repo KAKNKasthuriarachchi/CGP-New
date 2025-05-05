@@ -5,6 +5,9 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Book, X } from "lucide-react";
+import Header from "../../components/Header";
+import footer from "../../components/footer";
+import Footer from "../../components/footer";
 
 export default function MyEnrollments() {
   const router = useRouter();
@@ -14,7 +17,7 @@ export default function MyEnrollments() {
   const [selectedEnrollment, setSelectedEnrollment] = useState(null);
   const [materials, setMaterials] = useState(null);
 
-  // Fetch user data and enrollments
+  
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -42,7 +45,7 @@ export default function MyEnrollments() {
     fetchUser();
   }, [router]);
 
-  // Fetch materials from the API
+
   const fetchMaterials = async (tutorName, subject, place) => {
     try {
       const response = await fetch(
@@ -57,12 +60,12 @@ export default function MyEnrollments() {
       return data.materials;
     } catch (err) {
       console.error("Error fetching materials:", err);
-      // Return null values as a fallback
+      
       return { tutes: null, recordings: null, pastPapers: null };
     }
   };
 
-  // Handle "View Materials" button click
+  
   const handleViewMaterials = async (enrollment) => {
     // Fetch materials for the selected tutor, subject, and place
     const materialsData = await fetchMaterials(enrollment.tutorName, enrollment.subject, enrollment.place);
@@ -81,22 +84,9 @@ export default function MyEnrollments() {
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Header */}
-      <header className="bg-green-600 text-white p-6 shadow-lg">
-        <div className="container mx-auto flex justify-between items-center">
-          <h1 className="text-2xl font-bold tracking-tight">My Enrollments</h1>
-          <nav className="hidden md:flex space-x-6">
-            <a href="/tutor-marketplace" className="hover:underline">Tutors</a>
-            <a href="/dashboard" className="hover:underline">Dashboard</a>
-            <a href="/auth/logout" className="hover:underline">Logout</a>
-          </nav>
-          <button
-            onClick={() => router.push("/tutor-marketplace")}
-            className="bg-white text-green-600 px-4 py-2 rounded-md font-medium hover:bg-green-50 transition"
-          >
-            Find Tutors
-          </button>
-        </div>
-      </header>
+      <Header />
+
+      {/* Main Content */}
 
       <main className="container mx-auto p-6">
         {/* Welcome Header */}
@@ -249,41 +239,7 @@ export default function MyEnrollments() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-green-600 text-white p-6 mt-8">
-        <div className="container mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
-          <div>
-            <h3 className="font-semibold text-lg mb-3">About TutorMatch</h3>
-            <p className="text-green-100">Established in 2018</p>
-          </div>
-          <div>
-            <h3 className="font-semibold text-lg mb-3">What We Do</h3>
-            <ul className="space-y-2 text-green-100">
-              <li>Our Mission</li>
-              <li>Join Our Team</li>
-              <li>Quality Tutors</li>
-              <li>Terms of Service</li>
-            </ul>
-          </div>
-          <div>
-            <h3 className="font-semibold text-lg mb-3">Our Community</h3>
-            <ul className="space-y-2 text-green-100">
-              <li>Student Center</li>
-              <li>Register as Mentor</li>
-              <li>Tweet with us</li>
-              <li>Brand Resources</li>
-            </ul>
-          </div>
-          <div>
-            <h3 className="font-semibold text-lg mb-3">Connect with Us</h3>
-            <ul className="space-y-2 text-green-100">
-              <li>Facebook</li>
-              <li>Twitter</li>
-              <li>Instagram</li>
-              <li>Email Newsletter</li>
-            </ul>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

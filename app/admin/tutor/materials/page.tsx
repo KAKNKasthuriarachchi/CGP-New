@@ -355,7 +355,7 @@ function AddTutorMaterialsPage() {
       <div className="container max-w-2xl bg-white p-10 rounded-2xl shadow-2xl">
         <div className="flex items-center text-2xl text-green-700 font-bold font-serif mb-8">
           <FaUser className="text-3xl mr-2" />
-          TuitionFinder Admin
+          TutorHub Admin
         </div>
         <h2 className="text-2xl font-semibold mb-6 text-gray-800">Add Tutor Materials</h2>
 
@@ -365,7 +365,7 @@ function AddTutorMaterialsPage() {
               <FaUser className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
               <select
                 id="tutor"
-                className={`w-full py-3 pl-10 pr-3 border rounded-lg bg-gray-50 focus:bg-white transition-all focus:outline-none focus:ring-1 ${
+                className={`w-full py-3 pl-10 pr-3 border rounded-lg text-black bg-gray-50 focus:bg-white transition-all focus:outline-none focus:ring-1 ${
                   errors.tutor ? 'border-red-500 focus:ring-red-500' : 'border-gray-200 focus:ring-green-500 focus:border-green-500'
                 }`}
                 value={selectedTutor}
@@ -383,7 +383,7 @@ function AddTutorMaterialsPage() {
                   selectedTutor ? 'text-xs -top-2 bg-white px-1 left-3 text-green-700' : 'top-3'
                 }`}
               >
-                Tutor
+               
               </label>
             </div>
             {errors.tutor && <p className="mt-1 text-xs text-red-500">{errors.tutor}</p>}
@@ -394,7 +394,7 @@ function AddTutorMaterialsPage() {
               <FaBook className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
               <select
                 id="subjectPlace"
-                className={`w-full py-3 pl-10 pr-3 border rounded-lg bg-gray-50 focus:bg-white transition-all focus:outline-none focus:ring-1 ${
+                className={`w-full py-3 pl-10 pr-3 border rounded-lg text-black bg-gray-50 focus:bg-white transition-all focus:outline-none focus:ring-1 ${
                   errors.subjectPlace ? 'border-red-500 focus:ring-red-500' : 'border-gray-200 focus:ring-green-500 focus:border-green-500'
                 }`}
                 value={selectedSubjectPlace}
@@ -413,7 +413,7 @@ function AddTutorMaterialsPage() {
                   selectedSubjectPlace ? 'text-xs -top-2 bg-white px-1 left-3 text-green-700' : 'top-3'
                 }`}
               >
-                Subject and Place
+              
               </label>
             </div>
             {errors.subjectPlace && <p className="mt-1 text-xs text-red-500">{errors.subjectPlace}</p>}
@@ -426,7 +426,7 @@ function AddTutorMaterialsPage() {
                 <div className="relative flex-1">
                   <FaFileAlt className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
                   <select
-                    className={`w-full py-3 pl-10 pr-3 border rounded-lg bg-gray-50 focus:bg-white transition-all focus:outline-none focus:ring-1 ${
+                    className={`w-full py-3 pl-10 pr-3 border rounded-lg text-black bg-gray-50 focus:bg-white transition-all focus:outline-none focus:ring-1 ${
                       errors.materials ? 'border-red-500 focus:ring-red-500' : 'border-gray-200 focus:ring-green-500 focus:border-green-500'
                     }`}
                     value={material.type}
@@ -446,7 +446,7 @@ function AddTutorMaterialsPage() {
                   <FaVideo className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
                   <input
                     type="file"
-                    className={`w-full py-3 pl-10 pr-3 border rounded-lg bg-gray-50 focus:bg-white transition-all focus:outline-none focus:ring-1 ${
+                    className={`w-full py-3 pl-10 pr-3 border rounded-lg text-black bg-gray-50 focus:bg-white transition-all focus:outline-none focus:ring-1 ${
                       errors.materials ? 'border-red-500 focus:ring-red-500' : 'border-gray-200 focus:ring-green-500 focus:border-green-500'
                     }`}
                     onChange={(e) => handleFileInputChange(e, index)}
@@ -459,7 +459,7 @@ function AddTutorMaterialsPage() {
                       material.file ? 'text-xs -top-2 bg-white px-1 left-3 text-green-700' : 'top-3'
                     }`}
                   >
-                    {material.file ? 'File Uploaded' : 'Upload or drag a file here (PDF, MP4, WEBM, OGG)'}
+                    {material.file ? 'File Uploaded' : ''}
                   </label>
                 </div>
                 <div className="flex items-center gap-2">
@@ -534,7 +534,7 @@ function AddTutorMaterialsPage() {
                     type="file"
                     id="imageUrl"
                     accept="image/*"
-                    className={`w-full py-3 pl-10 pr-3 border rounded-lg bg-gray-50 focus:bg-white transition-all focus:outline-none focus:ring-1 ${
+                    className={`w-full py-3 pl-10 pr-3 border rounded-lg text-black bg-gray-50 focus:bg-white transition-all focus:outline-none focus:ring-1 ${
                       adErrors.adImageUrl ? 'border-red-500 focus:ring-red-500' : 'border-gray-200 focus:ring-green-500 focus:border-green-500'
                     } ${adUploading ? "opacity-50 cursor-not-allowed" : ""}`}
                     placeholder=" "
@@ -547,7 +547,7 @@ function AddTutorMaterialsPage() {
                       adUploading ? "text-gray-400" : ""
                     }`}
                   >
-                    {adUploading ? "Uploading..." : "Upload Advertisement Image"}
+                    {adUploading ? "Uploading..." : ""}
                   </label>
                 </div>
                 {adErrors.adImageUrl && <p className="mt-1 text-xs text-red-500">{adErrors.adImageUrl}</p>}
@@ -577,7 +577,7 @@ function AddTutorMaterialsPage() {
                   <input
                     type="url"
                     id="link"
-                    className={`w-full py-3 pl-10 pr-3 border rounded-lg bg-gray-50 focus:bg-white transition-all focus:outline-none focus:ring-1 ${
+                    className={`w-full py-3 pl-10 pr-3 border rounded-lg text-black bg-gray-50 focus:bg-white transition-all focus:outline-none focus:ring-1 ${
                       adErrors.adLink ? 'border-red-500 focus:ring-red-500' : 'border-gray-200 focus:ring-green-500 focus:border-green-500'
                     }`}
                     placeholder=" "

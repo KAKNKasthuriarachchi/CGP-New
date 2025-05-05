@@ -24,7 +24,7 @@ export default function ContactUs() {
     setStatus("Sending...");
 
     try {
-      const response = await fetch('/api/send-email/route.js', {
+      const response = await fetch('/api/sendemail', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -235,7 +235,7 @@ export default function ContactUs() {
             {/* Email Us Section */}
             <div className="bg-gray-100 p-6 rounded-lg shadow-md max-w-md mx-auto animate-contact-fade-in-up" style={{ animationDelay: "0.4s" }}>
               <h2 className="text-xl font-semibold mb-2 text-green-800">Email Us</h2>
-              <p className="break-words text-gray-600">tutorhub123@gmail.com</p>
+              <p className="break-words text-gray-600">tutorhub1111@gmail.com</p>
               <p className="mt-2 text-sm text-gray-600">Response within 24 hours</p>
               <p className="text-sm text-gray-600">Support available in English and Sinhala</p>
             </div>

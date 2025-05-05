@@ -6,7 +6,7 @@ import { FaUserCircle, FaStar } from 'react-icons/fa';
 import Header from '../components/Header';
 import Footer from '../components/footer';
 
-// Define the Tutor interface
+
 interface Tutor {
   id: string;
   name: string;
@@ -16,7 +16,7 @@ interface Tutor {
   photo?: string;
 }
 
-// Custom hook for Intersection Observer
+
 const useIntersectionObserver = (options: IntersectionObserverInit) => {
   const [isVisible, setIsVisible] = useState(false);
   const ref = useRef<HTMLDivElement | null>(null);
@@ -53,7 +53,7 @@ const useIntersectionObserver = (options: IntersectionObserverInit) => {
   return { ref, isVisible };
 };
 
-// ScrollReveal Component to wrap sections
+
 const ScrollReveal: React.FC<{ children: React.ReactNode; stagger?: boolean; index?: number }> = ({ children, stagger = false, index = 0 }) => {
   const { ref, isVisible } = useIntersectionObserver({
     threshold: 0.05,
@@ -73,7 +73,7 @@ const ScrollReveal: React.FC<{ children: React.ReactNode; stagger?: boolean; ind
   );
 };
 
-// Tutor Card Component with typed props
+
 const TutorCard: React.FC<{ tutor: Tutor; index: number; scale?: number }> = ({ tutor, index, scale = 1 }) => {
   const router = useRouter();
   const [imageFailed, setImageFailed] = useState(false);
@@ -123,7 +123,7 @@ const TutorCard: React.FC<{ tutor: Tutor; index: number; scale?: number }> = ({ 
   );
 };
 
-// Tutors Page Component
+
 export default function Tutors() {
   const [tutors, setTutors] = useState<Tutor[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -191,23 +191,23 @@ export default function Tutors() {
         }
       `}</style>
 
-      {/* Header */}
+   
       <Header/>
 
-      {/* Tutors Section - Added top padding to prevent header overlap */}
+    
       <ScrollReveal>
         <section className="bg-white pt-20">
           <div className="max-w-7xl mx-auto px-4 py-12">
             <h2 className="text-3xl font-bold text-gray-800 text-center mb-8">All Tutors</h2>
 
-            {/* Search Bar */}
+        
             <div className="mb-8 flex justify-center">
               <input
                 type="text"
                 placeholder="Search by name, section, or subject..."
                 value={keyword}
                 onChange={handleSearchChange}
-                className="w-full max-w-md px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600"
+                className="w-full max-w-md px-4 py-2 border rounded-lg text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-600"
               />
             </div>
 
@@ -227,7 +227,7 @@ export default function Tutors() {
         </section>
       </ScrollReveal>
 
-      {/* Footer */}
+     
       <ScrollReveal>
    <Footer/>
       </ScrollReveal>

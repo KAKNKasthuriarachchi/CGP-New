@@ -14,7 +14,7 @@ export const authOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
-          throw new Error('Please provide email and password');
+          throw new Error('Please provide both email and password');
         }
 
         await dbConnect();
@@ -22,7 +22,7 @@ export const authOptions = {
         const User = await user.findOne({ email: credentials.email });
         
         if (!User) {
-          throw new Error('No user found with this email');
+          throw new Error('Invalid email: No user found with this email');
         }
         
         const isValidPassword = await bcrypt.compare(credentials.password, User.password);

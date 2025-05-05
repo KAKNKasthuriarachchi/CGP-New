@@ -220,7 +220,7 @@ function AddTutorPage() {
       <div className="container max-w-2xl mx-auto bg-white p-10 rounded-2xl shadow-2xl">
         <div className="flex items-center text-2xl text-green-700 font-bold font-serif mb-8">
           <FaGraduationCap className="text-3xl mr-2" />
-          TuitionFinder Admin
+          TutorHub Admin
         </div>
         <h2 className="text-2xl font-semibold mb-6 text-gray-800">Add New Tutor</h2>
         <form onSubmit={handleSubmit}>
@@ -231,7 +231,7 @@ function AddTutorPage() {
                 <input
                   type="text"
                   id="firstName"
-                  className={`w-full py-3 pl-10 pr-3 border rounded-lg bg-gray-50 focus:bg-white transition-all focus:outline-none focus:ring-1 ${
+                  className={`w-full py-3 pl-10 pr-3 border rounded-lg text-black bg-gray-50 focus:bg-white transition-all focus:outline-none focus:ring-1 ${
                     errors.firstName
                       ? "border-red-500 focus:ring-red-500"
                       : "border-gray-200 focus:ring-green-500 focus:border-green-500"
@@ -257,7 +257,7 @@ function AddTutorPage() {
                 <input
                   type="text"
                   id="lastName"
-                  className={`w-full py-3 pl-10 pr-3 border rounded-lg bg-gray-50 focus:bg-white transition-all focus:outline-none focus:ring-1 ${
+                  className={`w-full py-3 pl-10 pr-3 border rounded-lg text-black bg-gray-50 focus:bg-white transition-all focus:outline-none focus:ring-1 ${
                     errors.lastName
                       ? "border-red-500 focus:ring-red-500"
                       : "border-gray-200 focus:ring-green-500 focus:border-green-500"
@@ -285,7 +285,7 @@ function AddTutorPage() {
               <input
                 type="email"
                 id="email"
-                className={`w-full py-3 pl-10 pr-3 border rounded-lg bg-gray-50 focus:bg-white transition-all focus:outline-none focus:ring-1 ${
+                className={`w-full py-3 pl-10 pr-3 border rounded-lg text-black bg-gray-50 focus:bg-white transition-all focus:outline-none focus:ring-1 ${
                   errors.email
                     ? "border-red-500 focus:ring-red-500"
                     : "border-gray-200 focus:ring-green-500 focus:border-green-500"
@@ -312,7 +312,7 @@ function AddTutorPage() {
               <input
                 type="tel"
                 id="contactNumber"
-                className={`w-full py-3 pl-10 pr-3 border rounded-lg bg-gray-50 focus:bg-white transition-all focus:outline-none focus:ring-1 ${
+                className={`w-full py-3 pl-10 pr-3 border rounded-lg text-blackbg-gray-50 focus:bg-white transition-all focus:outline-none focus:ring-1 ${
                   errors.contactNumber
                     ? "border-red-500 focus:ring-red-500"
                     : "border-gray-200 focus:ring-green-500 focus:border-green-500"
@@ -339,7 +339,7 @@ function AddTutorPage() {
               <input
                 type="text"
                 id="section"
-                className={`w-full py-3 pl-10 pr-3 border rounded-lg bg-gray-50 focus:bg-white transition-all focus:outline-none focus:ring-1 ${
+                className={`w-full py-3 pl-10 pr-3 border rounded-lg text-black bg-gray-50 focus:bg-white transition-all focus:outline-none focus:ring-1 ${
                   errors.section
                     ? "border-red-500 focus:ring-red-500"
                     : "border-gray-200 focus:ring-green-500 focus:border-green-500"
@@ -366,7 +366,7 @@ function AddTutorPage() {
               <input
                 type="text"
                 id="stream"
-                className={`w-full py-3 pl-10 pr-3 border rounded-lg bg-gray-50 focus:bg-white transition-all focus:outline-none focus:ring-1 ${
+                className={`w-full py-3 pl-10 pr-3 border rounded-lg text-black bg-gray-50 focus:bg-white transition-all focus:outline-none focus:ring-1 ${
                   errors.stream
                     ? "border-red-500 focus:ring-red-500"
                     : "border-gray-200 focus:ring-green-500 focus:border-green-500"
@@ -395,7 +395,7 @@ function AddTutorPage() {
                   <FaBook className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
                   <input
                     type="text"
-                    className={`w-full py-3 pl-10 pr-3 border rounded-lg bg-gray-50 focus:bg-white transition-all focus:outline-none focus:ring-1 ${
+                    className={`w-full py-3 pl-10 pr-3 border rounded-lg text-black bg-gray-50 focus:bg-white transition-all focus:outline-none focus:ring-1 ${
                       errors.subject
                         ? "border-red-500 focus:ring-red-500"
                         : "border-gray-200 focus:ring-green-500 focus:border-green-500"
@@ -416,7 +416,7 @@ function AddTutorPage() {
                   <FaMapMarkerAlt className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
                   <input
                     type="text"
-                    className={`w-full py-3 pl-10 pr-3 border rounded-lg bg-gray-50 focus:bg-white transition-all focus:outline-none focus:ring-1 ${
+                    className={`w-full py-3 pl-10 pr-3 border rounded-lg text-black bg-gray-50 focus:bg-white transition-all focus:outline-none focus:ring-1 ${
                       errors.subject
                         ? "border-red-500 focus:ring-red-500"
                         : "border-gray-200 focus:ring-green-500 focus:border-green-500"
@@ -465,7 +465,7 @@ function AddTutorPage() {
                 type="file"
                 id="picture"
                 accept="image/*"
-                className={`w-full py-3 pl-10 pr-3 border rounded-lg bg-gray-50 focus:bg-white transition-all focus:outline-none focus:ring-1 ${
+                className={`w-full py-3 pl-10 pr-3 border rounded-lg  bg-gray-50 focus:bg-white transition-all focus:outline-none focus:ring-1 ${
                   errors.picture
                     ? "border-red-500 focus:ring-red-500"
                     : "border-gray-200 focus:ring-green-500 focus:border-green-500"
@@ -501,7 +501,7 @@ function AddTutorPage() {
               <input
                 type="text"
                 id="qualifications"
-                className={`w-full py-3 pl-10 pr-3 border rounded-lg bg-gray-50 focus:bg-white transition-all focus:outline-none focus:ring-1 ${
+                className={`w-full py-3 pl-10 pr-3 border rounded-lg text-black bg-gray-50 focus:bg-white transition-all focus:outline-none focus:ring-1 ${
                   errors.qualifications
                     ? "border-red-500 focus:ring-red-500"
                     : "border-gray-200 focus:ring-green-500 focus:border-green-500"
@@ -527,7 +527,7 @@ function AddTutorPage() {
               <FaInfoCircle className="absolute left-3 top-3 text-gray-500" />
               <textarea
                 id="description"
-                className={`w-full py-3 pl-10 pr-3 border rounded-lg bg-gray-50 focus:bg-white transition-all focus:outline-none focus:ring-1 ${
+                className={`w-full py-3 pl-10 pr-3 border rounded-lg text-black bg-gray-50 focus:bg-white transition-all focus:outline-none focus:ring-1 ${
                   errors.description
                     ? "border-red-500 focus:ring-red-500"
                     : "border-gray-200 focus:ring-green-500 focus:border-green-500"

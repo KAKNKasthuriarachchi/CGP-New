@@ -238,7 +238,7 @@ export default function AdminLogin() {
         <div className="bg-white w-3/5 p-12 flex flex-col justify-center">
           <div className="flex items-center text-2xl font-bold text-green-700 mb-8 font-serif">
             <img src="/logo.ico" alt="App Logo" className="w-7 h-7 mr-2" />
-            TutorMart
+            TutorHub
             <span className="ml-2 bg-green-900 text-white text-xs px-2 py-1 rounded">ADMIN</span>
           </div>
           
@@ -263,7 +263,7 @@ export default function AdminLogin() {
                   type="text"
                   id="username"
                   name="username"
-                  className={`w-full py-3 pl-10 pr-4 border rounded-3xl bg-white focus:outline-none focus:border-green-500 focus:bg-white transition-all shadow-sm hover:shadow-md hover:border-green-600 ${errors.username ? 'border-red-500' : 'border-gray-200'}`}
+                  className={`w-full py-3 pl-10 pr-4 border rounded-3xl bg-white text-black placeholder-gray-400 focus:outline-none focus:border-green-500 focus:bg-white transition-all shadow-sm hover:shadow-md hover:border-green-600 ${errors.username ? 'border-red-500' : 'border-gray-200'}`}
                   placeholder=" "
                   value={formData.username}
                   onChange={handleChange}
@@ -290,7 +290,7 @@ export default function AdminLogin() {
                   type={passwordVisible ? "text" : "password"}
                   id="password"
                   name="password"
-                  className={`w-full py-3 pl-10 pr-10 border rounded-3xl bg-white focus:outline-none focus:border-green-500 focus:bg-white transition-all shadow-sm hover:shadow-md hover:border-green-600 ${errors.password ? 'border-red-500' : 'border-gray-200'}`}
+                  className={`w-full py-3 pl-10 pr-10 border rounded-3xl bg-white text-black placeholder-gray-400 focus:outline-none focus:border-green-500 focus:bg-white transition-all shadow-sm hover:shadow-md hover:border-green-600 ${errors.password ? 'border-red-500' : 'border-gray-200'}`}
                   placeholder=" "
                   value={formData.password}
                   onChange={handleChange}

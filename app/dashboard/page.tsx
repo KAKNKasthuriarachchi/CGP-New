@@ -2,12 +2,12 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { FaUserCircle, FaStar, FaChevronLeft, FaChevronRight, FaPhone, FaEnvelope } from 'react-icons/fa';
+import { FaUserCircle, FaStar, FaChevronLeft, FaChevronRight, FaPhone, FaEnvelope, FaUserGraduate, FaBook, FaHeadset } from 'react-icons/fa';
 import { useSession } from 'next-auth/react';
+import Cookies from 'js-cookie';
 import Header from '../components/Header';
 import Footer from '../components/footer';
 
-// Define the Tutor interface
 interface Tutor {
   id: string;
   name: string;
@@ -17,7 +17,6 @@ interface Tutor {
   photo?: string;
 }
 
-// Define the Ad interface
 interface Ad {
   imageUrl: string;
   title?: string;
@@ -25,7 +24,6 @@ interface Ad {
   link?: string;
 }
 
-// Custom hook for Intersection Observer
 const useIntersectionObserver = (options: IntersectionObserverInit) => {
   const [isVisible, setIsVisible] = useState(false);
   const ref = useRef<HTMLDivElement | null>(null);
@@ -62,19 +60,16 @@ const useIntersectionObserver = (options: IntersectionObserverInit) => {
   return { ref, isVisible };
 };
 
-// ScrollReveal Component to wrap sections
 const ScrollReveal: React.FC<{ children: React.ReactNode; stagger?: boolean; index?: number }> = ({ children, stagger = false, index = 0 }) => {
   const { ref, isVisible } = useIntersectionObserver({
-    threshold: 0.05,
+    threshold: 0.1,
     rootMargin: '-50px',
   });
 
   return (
     <div
       ref={ref}
-      className={`transition-opacity duration-1000 ${
-        isVisible ? 'opacity-100 animate-fadeInUp' : 'opacity-0'
-      }`}
+      className={`transition-opacity duration-1000 ${isVisible ? 'opacity-100 animate-fadeInUp' : 'opacity-0'}`}
       style={stagger ? { animationDelay: `${index * 0.2}s` } : {}}
     >
       {children}
@@ -82,7 +77,6 @@ const ScrollReveal: React.FC<{ children: React.ReactNode; stagger?: boolean; ind
   );
 };
 
-// Tutor Card Component with typed props
 const TutorCard: React.FC<{ tutor: Tutor; scale: number }> = ({ tutor, scale }) => {
   const router = useRouter();
   const [imageFailed, setImageFailed] = useState(false);
@@ -91,46 +85,45 @@ const TutorCard: React.FC<{ tutor: Tutor; scale: number }> = ({ tutor, scale }) 
     router.push(`/tutor/${tutor.id}`);
   };
 
-  const iconSizeClass = scale >= 1 ? 'w-40 h-40' : 'w-32 h-32';
-  const textSizeClass = scale >= 1 ? 'text-lg' : 'text-base';
-  const streamSizeClass = scale >= 1 ? 'text-xs' : 'text-[10px]';
-  const starSizeClass = scale >= 1 ? 'w-4 h-4' : 'w-3 h-3';
+  const iconSizeClass = scale >= 1 ? 'w-32 h-32' : 'w-24 h-24';
+  const textSizeClass = scale >= 1 ? 'text-base' : 'text-sm';
+  const streamSizeClass = scale >= 1 ? 'text-[10px]' : 'text-[8px]';
+  const starSizeClass = scale >= 1 ? 'w-3 h-3' : 'w-2 h-2';
 
   return (
     <div
       onClick={handleClick}
-      className="p-3 bg-white rounded-lg shadow-md w-48 flex-shrink-0 cursor-pointer hover:shadow-lg transition-all flex flex-col items-center"
+      className="p-2 bg-gray-50 rounded-lg shadow-md w-48 flex-shrink-0 cursor-pointer hover:shadow-lg hover:scale-125 transition-all duration-300 flex flex-col items-center"
       style={{ transform: `scale(${scale})`, transformOrigin: 'center' }}
     >
-      <div className="mb-4">
-        <div className={`${iconSizeClass} border border-gray-300 flex items-center justify-center rounded-md`}>
+      <div className="mb-2">
+        <div className={`${iconSizeClass} border-2 border-emerald-600 flex items-center justify-center rounded-full`}>
           {tutor.photo && !imageFailed ? (
             <img
               src={tutor.photo}
               alt={`${tutor.name}'s photo`}
-              className="w-full h-full object-contain rounded-md"
+              className="w-full h-full object-cover rounded-full"
               onError={() => setImageFailed(true)}
             />
           ) : (
-            <FaUserCircle className={`${iconSizeClass} text-gray-400`} />
+            <FaUserCircle className={`${iconSizeClass} text-emerald-800`} />
           )}
         </div>
       </div>
-      <div className="flex items-center mb-2">
+      <div className="flex items-center mb-1">
         {[...Array(5)].map((_, index) => (
           <FaStar
             key={index}
-            className={`${starSizeClass} ${index < Math.round(tutor.rating) ? 'text-yellow-500' : 'text-gray-300'}`}
+            className={`${starSizeClass} ${index < Math.round(tutor.rating) ? 'text-yellow-400' : 'text-gray-400'}`}
           />
         ))}
       </div>
-      <h3 className={`${textSizeClass} font-semibold text-gray-800 text-center`}>{tutor.name}</h3>
-      <p className={`${streamSizeClass} text-gray-500 text-center`}>{tutor.stream} - {tutor.section}</p>
+      <h3 className={`${textSizeClass} font-bold text-gray-900 text-center`}>{tutor.name}</h3>
+      <p className={`${streamSizeClass} text-gray-700 text-center`}>{tutor.stream} - {tutor.section}</p>
     </div>
   );
 };
 
-// Dashboard Component for Logged-In Users
 export default function Dashboard() {
   const router = useRouter();
   const { data: session, status } = useSession();
@@ -143,9 +136,49 @@ export default function Dashboard() {
   const [currentTutorIndex, setCurrentTutorIndex] = useState<number>(0);
   const [isAdHovered, setIsAdHovered] = useState<boolean>(false);
   const [adDimensions, setAdDimensions] = useState<{ width: number; height: number }[]>([]);
+  const [showCookiePopup, setShowCookiePopup] = useState<boolean>(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Fetch tutors and ads
+  useEffect(() => {
+    console.log('Session Status:', status);
+    console.log('Session Data:', session);
+  }, [status, session]);
+
+  useEffect(() => {
+    if (status !== 'authenticated') {
+      console.log('Not authenticated yet, skipping cookie check');
+      return;
+    }
+
+    console.log('User is authenticated, checking cookie consent');
+    const consent = Cookies.get('cookieConsent');
+    console.log('Cookie Consent Value:', consent);
+
+    if (consent === undefined) {
+      console.log('No cookieConsent found, showing popup');
+      setShowCookiePopup(true);
+    } else {
+      console.log('cookieConsent exists, hiding popup');
+      setShowCookiePopup(false);
+    }
+  }, [status]);
+
+  useEffect(() => {
+    console.log('showCookiePopup state:', showCookiePopup);
+  }, [showCookiePopup]);
+
+  const handleAcceptCookies = () => {
+    console.log('User accepted cookies');
+    Cookies.set('cookieConsent', 'true', { expires: 1/1440 });
+    setShowCookiePopup(false);
+  };
+
+  const handleDeclineCookies = () => {
+    console.log('User declined cookies');
+    Cookies.set('cookieConsent', 'false', { expires: 1/1440 });
+    setShowCookiePopup(false);
+  };
+
   useEffect(() => {
     if (status === 'unauthenticated') {
       router.push('/');
@@ -195,7 +228,6 @@ export default function Dashboard() {
 
         if (data.success) {
           setAds(data.ads);
-          // Initialize dimensions array with placeholders
           setAdDimensions(data.ads.map(() => ({ width: 0, height: 0 })));
         } else {
           throw new Error('Failed to fetch ads');
@@ -210,7 +242,6 @@ export default function Dashboard() {
     fetchAds();
   }, [status, router]);
 
-  // Load image dimensions dynamically
   useEffect(() => {
     const loadImageDimensions = async () => {
       const dimensionsPromises = ads.map((ad) => {
@@ -221,9 +252,8 @@ export default function Dashboard() {
             resolve({ width: img.naturalWidth, height: img.naturalHeight });
           };
           img.onerror = () => {
-            // Fallback dimensions if image fails to load
-            resolve({ width: 672, height: 448 }); // Default to 3:2 aspect ratio
-          };
+            resolve({ width: 672, height: 448 });
+          }
         });
       });
 
@@ -236,7 +266,6 @@ export default function Dashboard() {
     }
   }, [ads]);
 
-  // Automatic sliding for ads
   const startAutoSlide = useCallback(() => {
     if (intervalRef.current) clearInterval(intervalRef.current);
     intervalRef.current = setInterval(() => {
@@ -283,28 +312,20 @@ export default function Dashboard() {
   };
 
   if (status === 'loading') {
+    console.log('Rendering: Loading state');
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   }
 
   if (status === 'unauthenticated') {
+    console.log('Rendering: Unauthenticated state, redirecting');
     return null;
   }
 
+  console.log('Rendering: Authenticated state, dashboard content');
   return (
     <div
-      className="min-h-screen bg-gray-0 relative"
-      style={{
-        background: `
-          linear-gradient(135deg, #ffffff, #f0fdf4),
-          repeating-linear-gradient(
-            45deg,
-            rgba(74, 222, 128, 0.1) 0px,
-            rgba(74, 222, 128, 0.1) 10px,
-            transparent 10px,
-            transparent 20px
-          )
-        `,
-      }}
+      className="min-h-screen relative"
+      style={{ background: '#ffffff' }}
     >
       <style jsx global>{`
         @keyframes fadeInUp {
@@ -320,66 +341,118 @@ export default function Dashboard() {
         .animate-fadeInUp {
           animation: fadeInUp 1.2s ease-out forwards;
         }
+        @keyframes pulse {
+          0%, 100% { transform: scale(1); }
+          50% { transform: scale(1.05); }
+        }
+        .animate-pulse-slow {
+          animation: pulse 2s infinite;
+        }
+        @keyframes moveUp {
+          0% { transform: translateY(100vh); }
+          100% { transform: translateY(-100px); }
+        }
+        .moving-shape {
+          position: absolute;
+          opacity: 0.5;
+          animation: moveUp 10s linear infinite;
+        }
+        .circle {
+          width: 40px;
+          height: 40px;
+          background: rgba(6, 95, 70, 0.5);
+          border-radius: 50%;
+        }
+        .triangle {
+          width: 0;
+          height: 0;
+          border-left: 20px solid transparent;
+          border-right: 20px solid transparent;
+          border-bottom: 40px solid rgba(6, 95, 70, 0.5);
+        }
       `}</style>
+      {/* Moving Shapes */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="moving-shape circle" style={{ left: '5%', top: '5%', animationDelay: '0s' }}></div>
+        <div className="moving-shape circle" style={{ left: '20%', top: '15%', animationDelay: '2s' }}></div>
+        <div className="moving-shape triangle" style={{ left: '35%', top: '25%', animationDelay: '4s' }}></div>
+        <div className="moving-shape circle" style={{ left: '50%', top: '35%', animationDelay: '6s' }}></div>
+        <div className="moving-shape triangle" style={{ left: '65%', top: '45%', animationDelay: '8s' }}></div>
+        <div className="moving-shape circle" style={{ left: '80%', top: '55%', animationDelay: '10s' }}></div>
+        <div className="moving-shape triangle" style={{ left: '95%', top: '65%', animationDelay: '12s' }}></div>
+      </div>
 
       <Header></Header>
 
-      <section className="bg-white relative flex flex-col items-center justify-center py-12 max-w-full w-full">
-        <div className="text-center mx-auto mt-16">
-          <div className="flex flex-row items-center justify-center space-x-4">
-            <img 
-              src="/logo.ico" 
-              alt="TutorHub" 
-              className="max-w-[100px] w-auto"
-            />
-            <h1 className="text-3xl font-bold text-green-600">TutorHub</h1>
-          </div>
-          <div className="mt-4">
-            <h2 className="text-2xl font-bold text-gray-800">
-              Welcome, {session?.user?.name ?? 'User'}!
-            </h2>
-          </div>
-          <p className="mt-4 text-lg text-gray-600 italic">
-            "Your Learning Journey Starts Here"
-          </p>
-        </div>
-      </section>
-
       <ScrollReveal>
-        <section className="bg-gray-50 border-2 border-green-500 rounded-xl shadow-lg mx-4 my-8">
-  <div className="max-w-7xl mx-auto px-4 py-12 text-center">
-    <h3 className="text-3xl font-bold text-gray-800 mb-4">Discover TutorHub</h3>
-    <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-      TutorHub connects students with top-tier educators for personalized learning experiences. 
-      Whether you're mastering a new subject or advancing your skills, our platform makes finding 
-      the perfect tutor easy and seamless. Join our community and start your learning journey today!
-    </p>
-    <div className="mt-6 flex justify-center">
-      <img 
-        src="/duo.jpeg" 
-        alt="Discover TutorMatch" 
-        className="w-full max-w-xl mx-auto rounded-lg shadow-md"
-      />
-    </div>
-    <button
-      onClick={() => router.push('/about')}
-      className="mt-6 px-6 py-2 bg-green-600 text-white rounded-full hover:bg-green-700 transition"
-    >
-      About Us
-    </button>
-  </div>
-</section>
+        <section className="relative flex flex-col items-center justify-center py-12">
+          <div className="text-center mx-auto mt-12">
+            <div className="flex flex-row items-center justify-center space-x-4">
+              <img
+                src="/logo.ico"
+                alt="TutorHub"
+                className="max-w-[100px] w-auto animate-pulse-slow"
+              />
+              <h1 className="text-4xl font-bold text-emerald-800 tracking-wide text-shadow-md">
+                TutorHub
+              </h1>
+            </div>
+            <div className="mt-4">
+              <h2 className="text-3xl font-bold text-gray-900">
+                Welcome, {session?.user?.name ?? 'User'}!
+              </h2>
+            </div>
+            <p className="mt-3 text-xl text-gray-700 italic animate-bounce">
+              "Your Learning Journey Starts Here"
+            </p>
+          </div>
+          <div className="mt-8">
+            <img
+              src="/bg.jpeg"
+              alt="Hero Tutor"
+              className="w-full max-w-3xl rounded-xl shadow-lg animate-pulse-slow"
+            />
+          </div>
+        </section>
       </ScrollReveal>
 
       <ScrollReveal>
-        <section className="bg-white relative">
-          <div className="max-w-[1600px] mx-auto px-4 py-12 text-center">
-          <h3 className="text-2xl font-semibold text-gray-800 mb-8 px-6 py-2 bg-white border-2 border-green-500 rounded-lg shadow-md">
-        Explore Our Offers
-      </h3>
-            {adError && <p className="text-red-500 text-center mb-4">{adError}</p>}
+        <section className="bg-gray-50 border-2 border-emerald-600 rounded-xl shadow-md mx-3 my-6">
+          <div className="max-w-6xl mx-auto px-3 py-8 text-center">
+            <h3 className="text-3xl font-bold text-gray-800 mb-3">Discover TutorHub</h3>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              TutorHub connects students with top-tier educators for personalized learning experiences. 
+              Whether you're mastering a new subject or advancing your skills, our platform makes finding 
+              the perfect tutor easy and seamless. Join our community and start your learning journey today!
+            </p>
+            <div className="mt-4 flex justify-center">
+              <img 
+                src="/duo.jpeg" 
+                alt="Discover TutorMatch" 
+                className="w-full max-w-md mx-auto rounded-lg shadow-md"
+              />
+            </div>
+            <button
+              onClick={() => router.push('/about')}
+              className="mt-4 px-5 py-2 bg-emerald-700 text-white rounded-full hover:bg-emerald-800 transition"
+            >
+              About Us
+            </button>
+          </div>
+        </section>
+      </ScrollReveal>
+
+      <ScrollReveal>
+        <section className="relative py-6">
+          <div className="max-w-[1200px] mx-auto px-2 text-center">
+            <div className="inline-block bg-gradient-to-r from-green-100 to-emerald-50 rounded-lg shadow-md mb-4 px-6 py-2">
+              <h3 className="text-2xl font-bold text-green-800">
+                Explore Our Offers
+              </h3>
+            </div>
+            {adError && <p className="text-red-500 text-center mb-2">{adError}</p>}
             {ads.length === 0 && !adError && (
-              <p className="text-gray-600 text-center mb-4">No advertisements available.</p>
+              <p className="text-gray-700 text-center mb-2">No advertisements available.</p>
             )}
             {ads.length > 0 && (
               <div className="relative">
@@ -400,48 +473,33 @@ export default function Dashboard() {
                   >
                     {ads.map((ad, index) => {
                       const dimensions = adDimensions[index] || { width: 672, height: 448 };
-                      // Calculate the aspect ratio
                       const aspectRatio = dimensions.width / dimensions.height;
-                      // Set a maximum width and calculate height based on aspect ratio
-                      const maxWidth = '600px';
+                      const maxWidth = '500px';
                       const maxHeight = `calc(${maxWidth} / ${aspectRatio})`;
 
                       return (
-                        <div 
-                          key={index} 
-                          className="min-w-full flex justify-center items-center"
-                        >
+                        <div key={index} className="min-w-full flex justify-center items-center">
                           <div
-                            className={`relative block transition-all duration-300 ${
-                              currentAdIndex === index ? 'scale-100' : 'scale-90'
-                            } mx-auto bg-white rounded-lg shadow-lg overflow-hidden min-w-[300px] md:min-w-[400px]`}
-                            style={{
-                              width: '100%',
-                              maxWidth: maxWidth,
-                              height: maxHeight,
-                            }}
+                            className="relative block transition-all duration-300 hover:scale-105 mx-auto bg-white rounded-lg shadow-md border-4 border-emerald-600 overflow-hidden min-w-[200px] md:min-w-[350px]"
+                            style={{ width: '100%', maxWidth, height: maxHeight }}
                           >
                             <img
                               src={ad.imageUrl}
                               alt="Advertisement"
-                              className="w-full h-full object-contain bg-gray-200"
+                              className="w-full h-full object-cover bg-gray-200"
                               onError={(e) => (e.currentTarget.src = '/placeholder-ad.png')}
                             />
                             <button
                               onClick={prevAd}
-                              className={`absolute left-4 top-1/2 transform -translate-y-1/2 bg-green-600 text-white p-3 rounded-full hover:bg-green-700 transition-all ${
-                                isAdHovered ? 'opacity-100' : 'opacity-0'
-                              }`}
+                              className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-emerald-800 text-white p-2 rounded-full hover:bg-emerald-900 transition-all shadow-md"
                             >
-                              <FaChevronLeft size={24} />
+                              <FaChevronLeft size={16} />
                             </button>
                             <button
                               onClick={nextAd}
-                              className={`absolute right-4 top-1/2 transform -translate-y-1/2 bg-green-600 text-white p-3 rounded-full hover:bg-green-700 transition-all ${
-                                isAdHovered ? 'opacity-100' : 'opacity-0'
-                              }`}
+                              className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-emerald-800 text-white p-2 rounded-full hover:bg-emerald-900 transition-all shadow-md"
                             >
-                              <FaChevronRight size={24} />
+                              <FaChevronRight size={16} />
                             </button>
                           </div>
                         </div>
@@ -449,7 +507,7 @@ export default function Dashboard() {
                     })}
                   </div>
                 </div>
-                <div className="flex justify-center mt-4 space-x-2">
+                <div className="flex justify-center mt-2 space-x-1">
                   {ads.map((_, index) => (
                     <button
                       key={index}
@@ -458,9 +516,7 @@ export default function Dashboard() {
                         stopAutoSlide();
                         startAutoSlide();
                       }}
-                      className={`w-3 h-3 rounded-full ${
-                        currentAdIndex === index ? 'bg-green-600' : 'bg-gray-300'
-                      }`}
+                      className={`w-2 h-2 rounded-full ${currentAdIndex === index ? 'bg-emerald-800' : 'bg-gray-300'} hover:bg-emerald-700 transition-all`}
                     />
                   ))}
                 </div>
@@ -470,139 +526,242 @@ export default function Dashboard() {
         </section>
       </ScrollReveal>
 
-      <ScrollReveal>
-      <section className="bg-white border-2 border-green-500 rounded-xl">
-  <div className="max-w-3xl mx-auto px-4 py-16">
-    <h3 className="text-2xl font-semibold text-green-500 text-center mb-8 px-6 py-2 ">
-      Choose Your Tutor
-    </h3>
-    {error && <p className="text-red-500 text-center mb-4">{error}</p>}
-    {loading && <p className="text-gray-600 text-center mb-4">Loading tutors...</p>}
-    {!loading && tutors.length === 0 && !error && (
-      <p className="text-gray-600 text-center mb-4">No tutors found.</p>
-    )}
-    {tutors.length > 0 && (
-      <div className="relative">
-        <div className="flex items-center justify-center">
-          <button
-            onClick={prevTutor}
-            className="flex-none -ml-12 bg-green-600 text-white p-3 rounded-full hover:bg-green-700 transition-all"
-            disabled={currentTutorIndex === 0}
-          >
-            <FaChevronLeft size={20} />
-          </button>
-          <div className="flex-1 overflow-x-hidden">
-            <div className="flex items-center justify-center">
-              <div
-                className="flex flex-nowrap transition-transform duration-500 ease-in-out"
-                style={{
-                  transform: `translateX(calc(50% - ${currentTutorIndex * 320}px - 160px))`,
-                }}
-              >
-                {tutors.map((tutor, index) => {
-                  const distance = Math.abs(index - currentTutorIndex);
-                  const scale = distance === 0 ? 1.2 : distance === 1 ? 1 : 0.8;
-                  return (
-                    <div key={tutor.id} className="flex-shrink-0 w-80 h-96 flex justify-center items-center">
-                      <TutorCard tutor={tutor} scale={scale} />
-                    </div>
-                  );
-                })}
+      <ScrollReveal index={1}>
+        <section className="py-6">
+          <div className="max-w-5xl mx-auto px-2 text-center">
+            <h3 className="text-2xl font-bold text-green-800 mb-4">Why Choose TutorHub</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="bg-gradient-to-b from-white to-emerald-50 border-2 border-emerald-200 rounded-lg p-6 shadow-md hover:shadow-xl hover:scale-105 transition-all duration-300 w-full md:w-80 mx-auto">
+                <FaUserGraduate className="text-green-600 w-8 h-8 mx-auto mb-2" />
+                <h4 className="text-lg font-semibold text-green-600 mb-1">Expert Tutors</h4>
+                <p className="text-gray-700 text-sm">Connect with top educators worldwide.</p>
               </div>
-            </div>
-          </div>
-          <button
-            onClick={nextTutor}
-            className="flex-none -mr-12 bg-green-600 text-white p-3 rounded-full hover:bg-green-700 transition-all"
-            disabled={currentTutorIndex === tutors.length - 1}
-          >
-            <FaChevronRight size={20} />
-          </button>
-        </div>
-        <div className="flex justify-center mt-4 space-x-2">
-          {tutors.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => setCurrentTutorIndex(index)}
-              className={`w-3 h-3 rounded-full ${
-                currentTutorIndex === index ? 'bg-green-600' : 'bg-gray-300'
-              }`}
-            />
-          ))}
-        </div>
-      </div>
-    )}
-    <div className="text-center mt-6">
-      <button
-        onClick={handleViewAllTutors}
-        className="px-6 py-2 bg-green-600 text-white rounded-full hover:bg-green-700 transition"
-      >
-        View All Tutors
-      </button>
-    </div>
-  </div>
-</section>
-      </ScrollReveal>
-
-      <ScrollReveal>
-        <section className="bg-white">
-          <div className="max-w-7xl mx-auto px-4 py-12">
-            <h3 className="text-2xl font-semibold text-gray-800 text-center mb-8">
-              What Our Community Says
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-              {[
-                { text: "I found the perfect tutor and improved my grades", name: "Priya R." },
-                { text: "This platform helped me find the best tutor for my needs", name: "John K." },
-                { text: "Teaching is my passion, I enjoy personalized tutoring", name: "Sarah M." },
-                { text: "Empowering students through personalized tutoring", name: "David L." },
-              ].map((review, index) => (
-                <ScrollReveal key={index} stagger={true} index={index}>
-                  <div className="bg-gray-100 p-6 rounded-lg shadow-md">
-                    <p className="text-gray-600 mb-4">"{review.text}"</p>
-                    <div className="flex items-center">
-                      <FaUserCircle className="w-10 h-10 text-gray-400 mr-2" />
-                      <p className="text-gray-800 font-semibold">{review.name}</p>
-                    </div>
-                  </div>
-                </ScrollReveal>
-              ))}
+              <div className="bg-gradient-to-b from-white to-emerald-50 border-2 border-emerald-200 rounded-lg p-6 shadow-md hover:shadow-xl hover:scale-105 transition-all duration-300 w-full md:w-80 mx-auto">
+                <FaBook className="text-green-600 w-8 h-8 mx-auto mb-2" />
+                <h4 className="text-lg font-semibold text-green-600 mb-1">Personalized Learning</h4>
+                <p className="text-gray-700 text-sm">Tailored sessions for your needs.</p>
+              </div>
+              <div className="bg-gradient-to-b from-white to-emerald-50 border-2 border-emerald-200 rounded-lg p-6 shadow-md hover:shadow-xl hover:scale-105 transition-all duration-300 w-full md:w-80 mx-auto">
+                <FaHeadset className="text-green-600 w-8 h-8 mx-auto mb-2" />
+                <h4 className="text-lg font-semibold text-green-600 mb-1">24/7 Support</h4>
+                <p className="text-gray-700 text-sm">Always here to assist you.</p>
+              </div>
             </div>
           </div>
         </section>
       </ScrollReveal>
 
-      <ScrollReveal>
-        <section className="bg-gray-100">
-          <div className="max-w-7xl mx-auto px-4 py-12 text-center">
-            <h3 className="text-2xl font-semibold text-gray-800 mb-8">Get in Touch</h3>
-            <p className="text-lg text-gray-600 max-w-3xl mx-auto mb-8">
+      <ScrollReveal index={2}>
+        <section className="py-6">
+          <div className="max-w-5xl mx-auto px-2 text-center">
+            <h3 className="text-2xl font-bold text-green-800 mb-4">Choose Your Tutor</h3>
+            {error && <p className="text-red-500 text-center mb-2">{error}</p>}
+            {loading && <p className="text-gray-700 text-center mb-2">Loading tutors...</p>}
+            {!loading && tutors.length === 0 && !error && (
+              <p className="text-gray-700 text-center mb-2">No tutors found.</p>
+            )}
+            {tutors.length > 0 && (
+              <div className="relative">
+                <div className="flex items-center justify-center">
+                  <button
+                    onClick={prevTutor}
+                    className="flex-none -ml-8 bg-emerald-800 text-white p-2 rounded-full hover:bg-emerald-900 transition-all shadow-md"
+                    disabled={currentTutorIndex === 0}
+                  >
+                    <FaChevronLeft size={16} />
+                  </button>
+                  <div className="flex-1 overflow-x-hidden">
+                    <div className="flex items-center justify-center">
+                      <div
+                        className="flex flex-nowrap transition-transform duration-500 ease-in-out"
+                        style={{ transform: `translateX(calc(50% - ${currentTutorIndex * 256}px - 128px))` }}
+                      >
+                        {tutors.map((tutor, index) => {
+                          const distance = Math.abs(index - currentTutorIndex);
+                          const scale = distance === 0 ? 1.2 : distance === 1 ? 1 : 0.8;
+                          return (
+                            <div key={tutor.id} className="flex-shrink-0 w-64 h-80 flex justify-center items-center">
+                              <TutorCard tutor={tutor} scale={scale} />
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    onClick={nextTutor}
+                    className="flex-none -mr-8 bg-emerald-800 text-white p-2 rounded-full hover:bg-emerald-900 transition-all shadow-md"
+                    disabled={currentTutorIndex === tutors.length - 1}
+                  >
+                    <FaChevronRight size={16} />
+                  </button>
+                </div>
+                <div className="flex justify-center mt-2 space-x-1">
+                  {tutors.map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setCurrentTutorIndex(index)}
+                      className={`w-2 h-2 rounded-full ${currentTutorIndex === index ? 'bg-emerald-800' : 'bg-gray-300'} hover:bg-emerald-700 transition-all`}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+            <div className="text-center mt-3">
+              <button
+                onClick={handleViewAllTutors}
+                className="px-4 py-1 bg-emerald-800 text-white rounded-full hover:bg-emerald-900 transition-all shadow-md animate-pulse-slow"
+              >
+                View All Tutors
+              </button>
+            </div>
+          </div>
+        </section>
+      </ScrollReveal>
+
+      <ScrollReveal index={3}>
+        <section className="py-6">
+          <div className="max-w-6xl mx-auto px-2 text-center">
+            <h3 className="text-2xl font-bold text-green-600 mb-4">Success Stories</h3>
+            <div className="mb-4">
+              <img
+                src="/dinna.jpg"
+                alt="Success Stories Hero"
+                className="w-full max-w-3xl mx-auto rounded-lg shadow-md"
+              />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="bg-white rounded-lg p-6 shadow-md hover:shadow-lg transition-all duration-300 w-full md:w-96 mx-auto">
+                <img
+                  src="/one lamaya.jpg"
+                  alt="Success Story 1"
+                  className="w-24 h-24 object-cover rounded-full mx-auto mb-4"
+                />
+                <div>
+                  <p className="text-gray-900 italic mb-2 text-sm">"My grades in mathematics improved significantly with TutorHub's personalized guidance over 2 years!"</p>
+                  <p className="text-gray-700 font-semibold text-sm">Sean M.</p>
+                  <p className="text-gray-600 text-xs">Subject: Mathematics | Duration: 2 years</p>
+                </div>
+              </div>
+              <div className="bg-white rounded-lg p-6 shadow-md hover:shadow-lg transition-all duration-300 w-full md:w-96 mx-auto">
+                <img
+                  src="/lamaya2.jpg"
+                  alt="Success Story 2"
+                  className="w-24 h-24 object-cover rounded-full mx-auto mb-4"
+                />
+                <div>
+                  <p className="text-gray-900 italic mb-2 text-sm">"The best tutoring experience for physics, boosting my grades in just 1 and half years with expert support!"</p>
+                  <p className="text-gray-700 font-semibold text-sm">Kelly N.</p>
+                  <p className="text-gray-600 text-xs">Subject: Physics | Duration: 1 and half years</p>
+                </div>
+              </div>
+              <div className="bg-white rounded-lg p-6 shadow-md hover:shadow-lg transition-all duration-300 w-full md:w-96 mx-auto">
+                <img
+                  src="/lamaya3.jpg"
+                  alt="Success Story 3"
+                  className="w-24 h-24 object-cover rounded-full mx-auto mb-4"
+                />
+                <div>
+                  <p className="text-gray-900 italic mb-2 text-sm">"Excelled in chemistry with tailored sessions over 11 months, thanks to TutorHub!"</p>
+                  <p className="text-gray-700 font-semibold text-sm">Aisha M.</p>
+                  <p className="text-gray-600 text-xs">Subject: Chemistry | Duration: 11 Months</p>
+                </div>
+              </div>
+              <div className="bg-white rounded-lg p-6 shadow-md hover:shadow-lg transition-all duration-300 w-full md:w-96 mx-auto">
+                <img
+                  src="/lamaya4.jpg"
+                  alt="Success Story 4"
+                  className="w-24 h-24 object-cover rounded-full mx-auto mb-4"
+                />
+                <div>
+                  <p className="text-gray-900 italic mb-2 text-sm">"Mastered programming skills in 8 months with incredible support from my tutor!"</p>
+                  <p className="text-gray-700 font-semibold text-sm">John S.</p>
+                  <p className="text-gray-600 text-xs">Subject: Programming | Duration: 8 months</p>
+                </div>
+              </div>
+              <div className="bg-white rounded-lg p-6 shadow-md hover:shadow-lg transition-all duration-300 w-full md:w-96 mx-auto">
+                <img
+                  src="/lamaya5.jpg"
+                  alt="Success Story 5"
+                  className="w-24 h-24 object-cover rounded-full mx-auto mb-4"
+                />
+                <div>
+                  <p className="text-gray-900 italic mb-2 text-sm">"Boosted my English skills in 6 months with engaging and interactive lessons!"</p>
+                  <p className="text-gray-700 font-semibold text-sm">Harry T.</p>
+                  <p className="text-gray-600 text-xs">Subject: English | Duration: 6 Months</p>
+                </div>
+              </div>
+              <div className="bg-white rounded-lg p-6 shadow-md hover:shadow-lg transition-all duration-300 w-full md:w-96 mx-auto">
+                <img
+                  src="/lamaya6.jpg"
+                  alt="Success Story 6"
+                  className="w-24 h-24 object-cover rounded-full mx-auto mb-4"
+                />
+                <div>
+                  <p className="text-gray-900 italic mb-2 text-sm">"Improved my history knowledge over 1 year with TutorHub's dedicated tutors!"</p>
+                  <p className="text-gray-700 font-semibold text-sm">Sam L.</p>
+                  <p className="text-gray-600 text-xs">Subject: History | Duration: 1 year</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </ScrollReveal>
+
+      <ScrollReveal index={4}>
+        <section className="py-6">
+          <div className="max-w-5xl mx-auto px-2 text-center">
+            <h3 className="text-2xl font-bold text-green-800 mb-4">Get in Touch</h3>
+            <p className="text-base text-gray-700 max-w-xl mx-auto mb-4">
               Have questions or need support? Our team is here to help you every step of the way.
-              Reach out to us via email or phone, or visit our Help Center for more resources.
             </p>
-            <div className="flex flex-col md:flex-row justify-center space-y-4 md:space-y-0 md:space-x-8">
-              <div className="flex items-center">
-                <FaEnvelope className="text-green-600 w-6 h-6 mr-2" />
-                <a href="mailto:support@tutormatch.com" className="text-gray-800 hover:text-green-700">
+            <div className="flex flex-col md:flex-row justify-center space-y-3 md:space-y-0 md:space-x-6">
+              <div className="flex items-center animate-bounce">
+                <FaEnvelope className="text-emerald-800 w-5 h-5 mr-1" />
+                <a href="mailto:support@tutorhub.com" className="text-lg text-gray-900 hover:text-emerald-800">
                   support@tutorhub.com
                 </a>
               </div>
-              <div className="flex items-center">
-                <FaPhone className="text-green-600 w-6 h-6 mr-2" />
-                <a href="tel:+1234567890" className="text-gray-800 hover:text-green-700">
+              <div className="flex items-center animate-bounce">
+                <FaPhone className="text-emerald-800 w-5 h-5 mr-1" />
+                <a href="tel:+94712345678" className="text-lg text-gray-900 hover:text-emerald-800">
                   +94712345678
                 </a>
               </div>
             </div>
             <button
               onClick={() => router.push('/support')}
-              className="mt-6 px-6 py-2 bg-green-600 text-white rounded-full hover:bg-green-700 transition"
+              className="mt-4 px-4 py-1 bg-emerald-800 text-white rounded-full hover:bg-emerald-900 transition-all shadow-md animate-pulse-slow"
             >
               Visit Help Center
             </button>
           </div>
         </section>
       </ScrollReveal>
+
+      {showCookiePopup && (
+        <div className="fixed bottom-0 w-full bg-emerald-700 border-t-4 border-emerald-900 shadow-xl p-3 z-50">
+          <div className="max-w-5xl mx-auto flex flex-col md:flex-row justify-between items-center">
+            <p className="text-gray-700 text-sm mb-2 md:mb-0">
+              We use cookies to enhance your experience. Learn more in our <a href="/privacy" className="text-white underline">Privacy Policy</a>
+            </p>
+            <div className="flex space-x-2">
+              <button
+                onClick={handleDeclineCookies}
+                className="px-3 py-1 border-2 border-emerald-200 text-white bg-transparent rounded-full hover:bg-emerald-600 transition"
+              >
+                Decline
+              </button>
+              <button
+                onClick={handleAcceptCookies}
+                className="px-3 py-1 bg-emerald-800 text-white rounded-full hover:bg-emerald-900 transition"
+              >
+                Accept
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <Footer />
     </div>

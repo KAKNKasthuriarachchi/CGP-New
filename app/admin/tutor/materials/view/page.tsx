@@ -89,7 +89,7 @@ function ViewTutorMaterialsPage() {
       <div className="container max-w-2xl bg-white p-10 rounded-2xl shadow-2xl">
         <div className="flex items-center text-2xl text-green-700 font-bold font-serif mb-8">
           <FaUser className="text-3xl mr-2" />
-          TuitionFinder Admin
+          TutorHub Admin
         </div>
         <h2 className="text-2xl font-semibold mb-6 text-gray-800">View Tutor Materials</h2>
 
@@ -98,7 +98,7 @@ function ViewTutorMaterialsPage() {
             <FaUser className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
             <select
               id="tutor"
-              className={`w-full py-3 pl-10 pr-3 border rounded-lg bg-gray-50 focus:bg-white transition-all focus:outline-none focus:ring-1 ${
+              className={`w-full py-3 pl-10 pr-3 border rounded-lg text-black bg-gray-50 focus:bg-white transition-all focus:outline-none focus:ring-1 ${
                 errors.tutor ? 'border-red-500 focus:ring-red-500' : 'border-gray-200 focus:ring-green-500 focus:border-green-500'
               }`}
               value={selectedTutor}
@@ -116,7 +116,7 @@ function ViewTutorMaterialsPage() {
                 selectedTutor ? 'text-xs -top-2 bg-white px-1 left-3 text-green-700' : 'top-3'
               }`}
             >
-              Tutor
+          
             </label>
           </div>
           {errors.tutor && <p className="mt-1 text-xs text-red-500">{errors.tutor}</p>}
@@ -127,7 +127,7 @@ function ViewTutorMaterialsPage() {
             <FaBook className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
             <select
               id="subjectPlace"
-              className={`w-full py-3 pl-10 pr-3 border rounded-lg bg-gray-50 focus:bg-white transition-all focus:outline-none focus:ring-1 ${
+              className={`w-full py-3 pl-10 pr-3 border rounded-lg text-black bg-gray-50 focus:bg-white transition-all focus:outline-none focus:ring-1 ${
                 errors.subjectPlace ? 'border-red-500 focus:ring-red-500' : 'border-gray-200 focus:ring-green-500 focus:border-green-500'
               }`}
               value={selectedSubjectPlace}
@@ -146,7 +146,7 @@ function ViewTutorMaterialsPage() {
                 selectedSubjectPlace ? 'text-xs -top-2 bg-white px-1 left-3 text-green-700' : 'top-3'
               }`}
             >
-              Subject and Place
+             
             </label>
           </div>
           {errors.subjectPlace && <p className="mt-1 text-xs text-red-500">{errors.subjectPlace}</p>}
