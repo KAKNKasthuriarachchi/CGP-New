@@ -1,4 +1,4 @@
-// app/api/sendemail/route.js or route.ts
+
 import nodemailer from 'nodemailer';
 
 export async function POST(req) {

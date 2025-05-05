@@ -169,13 +169,13 @@ export default function Dashboard() {
 
   const handleAcceptCookies = () => {
     console.log('User accepted cookies');
-    Cookies.set('cookieConsent', 'true', { expires: 1/1440 });
+    Cookies.set('cookieConsent', 'true', { expires: 10 });
     setShowCookiePopup(false);
   };
 
   const handleDeclineCookies = () => {
     console.log('User declined cookies');
-    Cookies.set('cookieConsent', 'false', { expires: 1/1440 });
+    Cookies.set('cookieConsent', 'false', { expires: 10 });
     setShowCookiePopup(false);
   };
 
@@ -371,7 +371,7 @@ export default function Dashboard() {
           border-bottom: 40px solid rgba(6, 95, 70, 0.5);
         }
       `}</style>
-      {/* Moving Shapes */}
+      
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="moving-shape circle" style={{ left: '5%', top: '5%', animationDelay: '0s' }}></div>
         <div className="moving-shape circle" style={{ left: '20%', top: '15%', animationDelay: '2s' }}></div>

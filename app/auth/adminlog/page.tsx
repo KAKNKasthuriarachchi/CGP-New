@@ -117,7 +117,7 @@ export default function AdminLogin() {
 
   return (
     <div className="min-h-screen flex justify-center items-center p-5 relative">
-      {/* Background Shapes with Rise Animation */}
+      
       <style jsx global>{`
         @keyframes rise {
           0% {
@@ -189,7 +189,7 @@ export default function AdminLogin() {
       `}</style>
 
       <div className="fixed inset-0 -z-10 bg-white">
-        {/* Green Shapes with Rise Animation */}
+       
         <div className="absolute left-10 w-24 h-24 bg-green-500/50 rounded-full shape animate-rise"></div>
         <div className="absolute right-20 w-32 h-32 bg-green-500/35 rounded-full shape animate-rise-delay-1"></div>
         <div className="absolute right-1/4 w-16 h-16 bg-green-500/60 rounded-full shape animate-rise-delay-2"></div>
@@ -205,7 +205,7 @@ export default function AdminLogin() {
       </div>
       
       <div className="flex w-full max-w-5xl rounded-2xl overflow-hidden shadow-2xl z-10 min-h-[550px]">
-        {/* Left panel */}
+       
         <div 
           className="relative w-2/5 flex flex-col justify-end p-10 text-white"
           style={{ 
@@ -234,7 +234,7 @@ export default function AdminLogin() {
           </div>
         </div>
         
-        {/* Right panel */}
+      
         <div className="bg-white w-3/5 p-12 flex flex-col justify-center">
           <div className="flex items-center text-2xl font-bold text-green-700 mb-8 font-serif">
             <img src="/logo.ico" alt="App Logo" className="w-7 h-7 mr-2" />

@@ -8,7 +8,6 @@ export async function POST(request) {
     const connection = await dbConnect();
     console.log('MongoDB connection status:', connection.connection.readyState);
 
-    // Log the Ad model to verify it's a Mongoose model
     console.log('Ad model:', ad);
     console.log('Is Ad a Mongoose model?', typeof ad === 'function' && ad.prototype.save);
 

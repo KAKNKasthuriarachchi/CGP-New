@@ -12,7 +12,7 @@ export async function POST(request) {
 
     const errors = {};
 
-    // Validate required fields
+    
     if (!firstName?.trim()) {
       errors.firstName = "Please enter your first name";
     }
@@ -37,7 +37,6 @@ export async function POST(request) {
       return NextResponse.json({ success: false, errors }, { status: 400 });
     }
 
-    // Check for existing user
     const existingUser = await user.findOne({ email });
     if (existingUser) {
       return NextResponse.json(
@@ -46,10 +45,8 @@ export async function POST(request) {
       );
     }
 
-    // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create new user
     const newUser = new user({
       firstName,
       lastName,

@@ -27,7 +27,7 @@ export async function GET() {
 
     return new Response(
       JSON.stringify({
-        success: true, // Add success field
+        success: true, 
         user: {
           id: userData._id.toString(),
           name: `${userData.firstName} ${userData.lastName}`,

@@ -171,7 +171,7 @@ const TuitionFinderRegistration: React.FC = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-5 relative">
-      {/* Background Design with Green Shapes and Rise Animation */}
+      
       <style jsx global>{`
         @keyframes rise {
           0% {
@@ -243,7 +243,7 @@ const TuitionFinderRegistration: React.FC = () => {
       `}</style>
 
       <div className="fixed inset-0 -z-10 bg-white">
-        {/* Green Shapes with Rise Animation */}
+       
         <div className="absolute left-10 w-24 h-24 bg-green-500/50 rounded-full shape animate-rise"></div>
         <div className="absolute right-20 w-32 h-32 bg-green-500/35 rounded-full shape animate-rise-delay-1"></div>
         <div className="absolute right-1/4 w-16 h-16 bg-green-500/60 rounded-full shape animate-rise-delay-2"></div>
@@ -259,7 +259,7 @@ const TuitionFinderRegistration: React.FC = () => {
       </div>
 
       <div className="w-full max-w-6xl flex flex-col md:flex-row rounded-2xl overflow-hidden shadow-2xl">
-        {/* Left Panel */}
+        
         <div 
           className="md:w-2/5 relative flex flex-col justify-end p-10 text-white"
           style={{ 
@@ -293,7 +293,6 @@ const TuitionFinderRegistration: React.FC = () => {
           </div>
         </div>
         
-        {/* Right Panel */}
         <div className="md:w-3/5 bg-white p-10 md:p-12 flex flex-col justify-center">
           <div className="font-serif text-2xl font-bold text-green-700 mb-8 flex items-center">
             <img src="/logo.ico" alt="App Logo" className="w-7 h-7 mr-2" />
@@ -306,9 +305,9 @@ const TuitionFinderRegistration: React.FC = () => {
           {errors.form && <p className="text-red-500 text-center mb-4">{errors.form}</p>}
           
           <form onSubmit={handleSubmit}>
-            {/* Name Fields Row */}
+           
             <div className="flex flex-col md:flex-row gap-4 mb-6">
-              {/* First Name */}
+              
               <div className="w-full relative">
                 <div className="relative">
                   <FaUser className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500" size={18} />
@@ -330,7 +329,6 @@ const TuitionFinderRegistration: React.FC = () => {
                 {errors.firstName && <p className="mt-1 text-xs text-red-500">{errors.firstName}</p>}
               </div>
               
-              {/* Last Name */}
               <div className="w-full relative">
                 <div className="relative">
                   <FaUser className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500" size={18} />
@@ -353,7 +351,7 @@ const TuitionFinderRegistration: React.FC = () => {
               </div>
             </div>
             
-            {/* Email */}
+            
             <div className="mb-6 relative">
               <div className="relative">
                 <FaEnvelope className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500" size={18} />
@@ -375,7 +373,7 @@ const TuitionFinderRegistration: React.FC = () => {
               {errors.email && <p className="mt-1 text-xs text-red-500">{errors.email}</p>}
             </div>
             
-            {/* Date of Birth */}
+            
             <div className="mb-6 relative">
               <div className="relative">
                 <FaCalendarAlt className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500" size={18} />
@@ -396,7 +394,6 @@ const TuitionFinderRegistration: React.FC = () => {
               {errors.dob && <p className="mt-1 text-xs text-red-500">{errors.dob}</p>}
             </div>
             
-            {/* Password */}
             <div className="mb-6 relative">
               <div className="relative">
                 <FaLock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500" size={18} />
@@ -423,7 +420,6 @@ const TuitionFinderRegistration: React.FC = () => {
                 </button>
               </div>
               
-              {/* Password strength meter */}
               <div className="h-1 bg-gray-200 rounded mt-2">
                 <div 
                   className={`h-full rounded transition-all ${getStrengthColor()}`} 
@@ -431,7 +427,7 @@ const TuitionFinderRegistration: React.FC = () => {
                 ></div>
               </div>
               
-              {/* Password requirements */}
+            
               <div className="flex gap-2 mt-2">
                 <div className={`text-xs flex-1 pl-4 relative ${passwordStrength.hasLength ? 'text-green-600' : 'text-gray-500'}`}>
                   <div className={`absolute left-0 top-1 w-2.5 h-2.5 rounded-full ${passwordStrength.hasLength ? 'bg-green-500' : 'bg-gray-300'}`}></div>
@@ -450,7 +446,7 @@ const TuitionFinderRegistration: React.FC = () => {
               {errors.password && <p className="mt-1 text-xs text-red-500">{errors.password}</p>}
             </div>
             
-            {/* Submit Button */}
+           
             <button 
               type="submit" 
               className="w-full py-3 bg-gradient-to-r from-green-600 to-green-700 text-white font-semibold rounded-3xl transition-all hover:translate-y-px hover:shadow-lg hover:scale-105 active:translate-y-0 active:scale-100 shadow-md mb-6 cursor-pointer"
@@ -459,7 +455,7 @@ const TuitionFinderRegistration: React.FC = () => {
             </button>
           </form>
           
-          {/* Footer */}
+        
           <div className="text-center text-gray-500 text-sm mt-6">
             Already have an account? <a href="/auth/login" className="text-green-700 font-semibold hover:underline">Login</a>
             <span className="mx-2">|</span>

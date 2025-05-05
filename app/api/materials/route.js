@@ -18,7 +18,6 @@ export async function GET(request) {
 
     await dbConnect();
 
-    // Step 1: Find the tutor by tutorName (assuming tutorName is "firstName lastName")
     const tutor = await adminTutor.findOne({
       $expr: {
         $eq: [
@@ -35,14 +34,14 @@ export async function GET(request) {
       });
     }
 
-    // Step 2: Fetch materials for the tutor, subject, and place
+    
     const materials = await TutorMaterial.find({
       tutor: tutor._id,
       "subject.name": subject,
       "subject.place": place,
     }).lean();
 
-    // Step 3: Format the response
+    
     const formattedMaterials = materials.map((material) => ({
       tutes: material.tutes || null,
       recordings: material.recordings || null,

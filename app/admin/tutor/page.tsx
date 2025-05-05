@@ -37,12 +37,12 @@ function AddTutorPage() {
   const [errors, setErrors] = useState({});
   const [uploading, setUploading] = useState(false);
 
-  // Handle file upload to Cloudinary
+  
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    // Validate file type (only allow images)
+    
     const validImageTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
     if (!validImageTypes.includes(file.type)) {
       setErrors({ ...errors, picture: "Please upload a valid image (JPEG, PNG, GIF, WEBP)" });
@@ -70,7 +70,7 @@ function AddTutorPage() {
         throw new Error(data.error?.message || "Failed to upload to Cloudinary");
       }
 
-      // Make sure we preserve the subject array structure when updating the formData
+      
       setFormData((prevData) => ({
         ...prevData,
         picture: data.secure_url

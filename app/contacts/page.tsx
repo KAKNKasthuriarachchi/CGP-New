@@ -13,7 +13,7 @@ export default function ContactUs() {
     message: "",
   });
 
-  const [status, setStatus] = useState<string | null>(null); // For success/error messages
+  const [status, setStatus] = useState<string | null>(null); 
 
   const handleChange = (e: { target: { name: any; value: any } }) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -39,7 +39,7 @@ export default function ContactUs() {
       const data = await response.json();
       if (data.success) {
         setStatus("Email sent successfully!");
-        setForm({ fullName: "", email: "", phone: "", subject: "", message: "" }); // Reset form
+        setForm({ fullName: "", email: "", phone: "", subject: "", message: "" }); 
       } else {
         throw new Error(data.message || 'Failed to send email');
       }
@@ -50,7 +50,7 @@ export default function ContactUs() {
 
   return (
     <div className="flex flex-col min-h-screen relative bg-white">
-      {/* Scoped Styles */}
+     
       <style jsx>{`
         /* Scoped to this component using a unique class */
         .contact-us-container {
@@ -132,12 +132,12 @@ export default function ContactUs() {
         }
       `}</style>
 
-      {/* Wrap content in a container with a unique class */}
+      
       <div className="contact-us-container">
-        {/* Fallback Background Layer */}
+        
         <div className="fixed inset-0 bg-white z-[-2]"></div>
 
-        {/* Background with Upward-Moving Circles */}
+        
         <div className="fixed inset-0 z-[-1] overflow-hidden">
           <span className="absolute w-16 h-16 bg-green-600/20 rounded-full left-10 bottom-0 animate-move-up-1" />
           <span className="absolute w-24 h-24 bg-green-300/20 rounded-full left-1/4 bottom-0 animate-move-up-2" />
@@ -152,13 +152,13 @@ export default function ContactUs() {
 
         <main className="flex-grow p-6 pt-16 bg-white relative z-[1]">
           <div className="max-w-4xl mx-auto space-y-12">
-            {/* Page Header */}
+          
             <div className="text-center animate-contact-fade-in-up" style={{ animationDelay: "0s" }}>
               <h1 className="text-3xl font-bold text-green-800 mb-4">Contact Us</h1>
               <p className="text-gray-600">We’re here to help! Reach out to us with any questions or inquiries.</p>
             </div>
 
-            {/* Send us a Message Section */}
+            
             <div className="bg-gray-50 p-8 rounded-lg shadow-md max-w-3xl mx-auto animate-contact-fade-in-up" style={{ animationDelay: "0.2s" }}>
               <h2 className="text-2xl font-bold mb-4 text-green-800">Send us a Message</h2>
               <p className="text-gray-600 mb-8">Fill out the form below and we'll get back to you shortly.</p>
@@ -232,7 +232,6 @@ export default function ContactUs() {
               </form>
             </div>
 
-            {/* Email Us Section */}
             <div className="bg-gray-100 p-6 rounded-lg shadow-md max-w-md mx-auto animate-contact-fade-in-up" style={{ animationDelay: "0.4s" }}>
               <h2 className="text-xl font-semibold mb-2 text-green-800">Email Us</h2>
               <p className="break-words text-gray-600">tutorhub1111@gmail.com</p>
@@ -240,7 +239,7 @@ export default function ContactUs() {
               <p className="text-sm text-gray-600">Support available in English and Sinhala</p>
             </div>
 
-            {/* Connect With Us Section */}
+           
             <div className="bg-gray-100 p-6 rounded-lg shadow-md max-w-md mx-auto animate-contact-fade-in-up" style={{ animationDelay: "0.6s" }}>
               <h2 className="text-xl font-semibold mb-4 text-green-800">Connect With Us</h2>
               <div className="flex justify-center space-x-6 text-2xl">

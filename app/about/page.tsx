@@ -16,7 +16,7 @@ export default function AboutUsPage() {
 
     
     <div className="bg-gray-50 min-h-screen">
-      {/* Custom CSS for Animation */}
+     
       <style>{`
         @keyframes fadeInSlideUp {
           0% {
@@ -35,7 +35,7 @@ export default function AboutUsPage() {
       `}</style>
       <Header/>
 
-      {/* Hero Section - Fade In with Upward Slide */}
+ 
 
       <section
         className="bg-gradient-to-r from-green-500 to-teal-500 text-white py-20 animate-fadeInSlideUp"
@@ -61,7 +61,7 @@ Whether you’re looking for academic support, test preparation, or skill develo
             </button>
           </div>
           <div className="md:w-1/2 mt-8 md:mt-0">
-            {/* Placeholder for Hero Image */}
+            
             <div className="w-full h-64 md:h-96 bg-gray-300 rounded-lg flex items-center justify-center">
               <img
                 src="/about1.jpeg"
@@ -73,14 +73,14 @@ Whether you’re looking for academic support, test preparation, or skill develo
         </div>
       </section>
 
-      {/* Mission Section - Fade In with Upward Slide */}
+     
       <section
         className="py-16 animate-fadeInSlideUp"
         style={{ animationDelay: "0.5s" }}
       >
         <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center">
           <div className="md:w-1/2 mb-8 md:mb-0">
-            {/* Placeholder for Mission Image */}
+            
             <div className="w-full h-64 md:h-80 bg-gray-300 rounded-lg flex items-center justify-center">
               <img
                 src="/about4.jpg"
@@ -100,7 +100,7 @@ Whether you’re looking for academic support, test preparation, or skill develo
         </div>
       </section>
 
-      {/* Features Section - Fade In with Upward Slide */}
+      
       <section
        className="bg-gradient-to-r from-green-500 to-teal-500 text-white py-20 animate-fadeInSlideUp"
         style={{ animationDelay: "1s" }}
@@ -154,7 +154,7 @@ Whether you’re looking for academic support, test preparation, or skill develo
         </div>
       </section>
 
-      {/* Team Section - Fade In with Upward Slide */}
+      
     <section
       className="py-16 bg-gray-50 animate-fadeInSlideUp"
       style={{ animationDelay: "1.5s" }}
@@ -292,7 +292,7 @@ Whether you’re looking for academic support, test preparation, or skill develo
       </div>
     </section>
 
-      {/* CTA Section - Fade In with Upward Slide */}
+     
       <section
        className="bg-gradient-to-r from-green-500 to-teal-500 text-white py-20 animate-fadeInSlideUp"
         style={{ animationDelay: "2s" }}
@@ -311,7 +311,6 @@ Whether you’re looking for academic support, test preparation, or skill develo
         </div>
       </section>
 
-      {/* Footer Section - Fade In with Upward Slide */}
       <Footer></Footer>
     </div>
   );

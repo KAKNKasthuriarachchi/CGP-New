@@ -14,7 +14,6 @@ function AddTutorMaterialsPage() {
   const [materials, setMaterials] = useState([{ type: 'Tute', file: null }]); // Changed from url to file
   const [errors, setErrors] = useState({});
 
-  // State for ad form
   const [adFormData, setAdFormData] = useState({
     imageUrl: '',
     link: '',
@@ -146,7 +145,7 @@ function AddTutorMaterialsPage() {
         throw new Error(data.error?.message || 'Failed to upload to Cloudinary');
       }
 
-      handleMaterialChange(index, 'file', data.secure_url); // Store the secure URL
+      handleMaterialChange(index, 'file', data.secure_url); 
       setErrors({ ...errors, materials: '' });
     } catch (err) {
       console.error('Error uploading material to Cloudinary:', err);

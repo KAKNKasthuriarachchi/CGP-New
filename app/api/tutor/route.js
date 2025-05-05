@@ -2,7 +2,7 @@ import adminTutor from "../../../lib/db/models/adminTutor";
 import { dbConnect } from "../../../lib/db/models/mongodb";
 import { NextResponse } from "next/server";
 
-// GET: Fetch tutors (by ID, stream/section, or all with pagination and keyword search)
+
 export async function GET(request) {
   try {
     await dbConnect();
@@ -15,7 +15,7 @@ export async function GET(request) {
     const limitParam = searchParams.get("limit") || "10";
     const skip = limitParam !== "all" ? (page - 1) * parseInt(limitParam, 10) : 0;
 
-    // If an ID is provided, fetch a single tutor
+    
     if (id) {
       const tutor = await adminTutor.findById(id);
       if (!tutor) {
@@ -30,7 +30,7 @@ export async function GET(request) {
       );
     }
 
-    // If stream and section are provided, fetch related tutors (excluding the tutor with the given ID)
+  
     if (section && stream) {
       if (!excludeId) {
         return NextResponse.json(
@@ -41,7 +41,7 @@ export async function GET(request) {
       const query = {
         stream,
         section,
-        _id: { $ne: excludeId }, // Exclude the current tutor
+        _id: { $ne: excludeId },
       };
       const relatedTutors = await adminTutor.find(query);
       return NextResponse.json(
@@ -50,7 +50,7 @@ export async function GET(request) {
       );
     }
 
-    // Otherwise, fetch tutors with pagination or all
+    
     const keyword = searchParams.get("keyword") || "";
     const query = {};
     if (keyword) {
@@ -92,7 +92,7 @@ export async function GET(request) {
   }
 }
 
-// POST: Insert a new tutor
+
 export async function POST(request) {
   try {
     await dbConnect();
@@ -110,7 +110,7 @@ export async function POST(request) {
       description,
     } = body;
 
-    // Validate required fields
+    
     if (
       !firstName ||
       !lastName ||
@@ -130,7 +130,7 @@ export async function POST(request) {
       );
     }
 
-    // Validate subject array
+  
     for (const sub of subject) {
       if (!sub.name || !sub.place) {
         return NextResponse.json(
@@ -140,7 +140,7 @@ export async function POST(request) {
       }
     }
 
-    // Validate picture URL (basic check to ensure it looks like a Cloudinary URL)
+   
     const urlPattern = /^https:\/\/res\.cloudinary\.com\/[a-zA-Z0-9_-]+\/image\/upload\/.+$/;
     if (!urlPattern.test(picture)) {
       return NextResponse.json(
@@ -149,7 +149,6 @@ export async function POST(request) {
       );
     }
 
-    // Check if tutor already exists
     const existingTutor = await adminTutor.findOne({ email });
     if (existingTutor) {
       return NextResponse.json(
@@ -158,7 +157,7 @@ export async function POST(request) {
       );
     }
 
-    // Create new tutor
+   
     const newTutor = new adminTutor({
       firstName,
       lastName,
@@ -167,7 +166,7 @@ export async function POST(request) {
       section,
       stream,
       subject,
-      picture, // Save the Cloudinary URL
+      picture, 
       qualifications,
       description,
     });
